@@ -16,8 +16,9 @@ import me.tludwig.parsing.peg.expressions.primaries.LiteralString;
 import me.tludwig.parsing.peg.expressions.primaries.NonTerminal;
 
 public abstract class PEGrammar {
-	public final HashMap<String, Expression> definitions = new HashMap<>();
-	private final NonTerminal                startSymbol;
+	public final HashMap<String, Expression>	definitions		= new HashMap<>();
+	private final HashMap<String, NonTerminal>	nonTerminals	= new HashMap<>();
+	private final NonTerminal					startSymbol;
 	
 	public PEGrammar(final String startSymbol) {
 		this.startSymbol = def(startSymbol);
@@ -36,7 +37,7 @@ public abstract class PEGrammar {
 	}
 	
 	public final NonTerminal def(final String name) {
-		return NonTerminal.of(this, name);
+		return nonTerminals.computeIfAbsent(name, __ -> NonTerminal.of(this, name));
 	}
 	
 	public final Sequence seq(final Expression... expressions) {
@@ -95,6 +96,14 @@ public abstract class PEGrammar {
 		return LiteralString.of(s);
 	}
 	
+	public final LiteralString CRLF() {
+		return string("\r\n");
+	}
+	
+	public final LiteralCharClass list(final char... chars) {
+		return LiteralCharClass.of(chars);
+	}
+	
 	public final LiteralCharClass list(final String def) {
 		return LiteralCharClass.of(def);
 	}
@@ -104,7 +113,106 @@ public abstract class PEGrammar {
 	}
 	
 	public final LiteralCharClass range(final int from, final int to) {
-		return LiteralCharClass.range((char) from, (char) to);
+		return LiteralCharClass.range(from, to);
+	}
+	
+	/**
+	 * [0-9]
+	 */
+	public final LiteralCharClass digits() {
+		return LiteralCharClass.digits();
+	}
+	
+	/**
+	 * [0-9a-fA-F]
+	 */
+	public final LiteralCharClass hexdigits() {
+		return LiteralCharClass.hexDigits();
+	}
+	
+	/**
+	 * [a-z]
+	 */
+	public final LiteralCharClass lower() {
+		return LiteralCharClass.lower();
+	}
+	
+	/**
+	 * [A-Z]
+	 */
+	public final LiteralCharClass upper() {
+		return LiteralCharClass.upper();
+	}
+	
+	/**
+	 * [a-zA-Z]
+	 */
+	public final LiteralCharClass letters() {
+		return LiteralCharClass.letters();
+	}
+	
+	/**
+	 * [a-zA-Z0-9]
+	 */
+	public final LiteralCharClass alnum() {
+		return LiteralCharClass.alnum();
+	}
+	
+	/**
+	 * [\x00-\x7F]
+	 */
+	public final LiteralCharClass ascii() {
+		return LiteralCharClass.ascii();
+	}
+	
+	public final LiteralCharClass blank() {
+		return LiteralCharClass.blank();
+	}
+	
+	/**
+	 * [\x00-\x1F\x7F]
+	 */
+	public final LiteralCharClass control() {
+		return LiteralCharClass.control();
+	}
+	
+	public final LiteralCharClass whitespace() {
+		return LiteralCharClass.whitespace();
+	}
+	
+	/**
+	 * [a-zA-Z0-9_]
+	 */
+	public final LiteralCharClass wchars() {
+		return LiteralCharClass.wordCharacters();
+	}
+	
+	/**
+	 * [!-/:-@\[-`{-~]
+	 */
+	public final LiteralCharClass punct() {
+		return LiteralCharClass.punctuation();
+	}
+	
+	/**
+	 * [\x21-\x7E]
+	 */
+	public final LiteralCharClass graphical() {
+		return LiteralCharClass.graphical();
+	}
+	
+	/**
+	 * [\x21-\x7E]
+	 */
+	public final LiteralCharClass visible() {
+		return LiteralCharClass.graphical();
+	}
+	
+	/**
+	 * [\x20-\x7E]
+	 */
+	public final LiteralCharClass printable() {
+		return LiteralCharClass.printable();
 	}
 	
 	public final LiteralAnyChar any() {
