@@ -5,8 +5,8 @@ import me.tludwig.parsing.peg.PEGrammar;
 import me.tludwig.parsing.peg.expressions.Expression;
 
 public class NonTerminal extends Expression {
-	private final String    name;
-	private final PEGrammar grammar;
+	private final String	name;
+	private final PEGrammar	grammar;
 	
 	private NonTerminal(final PEGrammar grammar, final String name) {
 		this.name = name;

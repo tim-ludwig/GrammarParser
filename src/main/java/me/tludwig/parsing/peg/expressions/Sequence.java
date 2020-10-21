@@ -1,7 +1,7 @@
-
 package me.tludwig.parsing.peg.expressions;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +21,10 @@ public final class Sequence extends Expression {
 	
 	public static Sequence of(final List<Expression> subExpressions) {
 		return new Sequence(subExpressions);
+	}
+	
+	public List<Expression> getSubExpressions() {
+		return Collections.unmodifiableList(subExpressions);
 	}
 	
 	@Override

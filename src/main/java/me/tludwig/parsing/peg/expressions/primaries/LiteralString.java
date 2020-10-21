@@ -14,6 +14,10 @@ public class LiteralString extends Expression {
 		return new LiteralString(s);
 	}
 	
+	public String getString() {
+		return s;
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
 		if(input.regionMatches(position, s, 0, s.length())) return new Match(this, position, s);
@@ -25,5 +29,4 @@ public class LiteralString extends Expression {
 	public String toString() {
 		return '"' + s + '"';
 	}
-	
 }

@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import me.tludwig.parsing.peg.Match;
 
 public final class Repetition extends Expression {
-	private final int min, max;
-	Expression        expression;
+	private final int	min, max;
+	Expression			expression;
 	
 	private Repetition(final Expression expression, final int min, final int max) {
 		if(expression instanceof Predicate) throw new IllegalArgumentException("No predicates!");
@@ -40,6 +40,18 @@ public final class Repetition extends Expression {
 		return atLeast(expression, 1);
 	}
 	
+	public int getMin() {
+		return min;
+	}
+	
+	public int getMax() {
+		return max;
+	}
+	
+	public Expression getExpression() {
+		return expression;
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
 		final LinkedList<Match> subMatches = new LinkedList<>();
@@ -50,9 +62,7 @@ public final class Repetition extends Expression {
 		for(; i < max || max < 0; i++) {
 			match = expression.match(input, cPos);
 			
-			if(match == null) {
-				break;
-			}
+			if(match == null) break;
 			
 			subMatches.add(match);
 			

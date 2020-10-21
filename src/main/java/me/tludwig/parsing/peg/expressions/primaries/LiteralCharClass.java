@@ -37,6 +37,10 @@ public final class LiteralCharClass extends Expression {
 		return LiteralCharClass.union(classes.toArray(new LiteralCharClass[classes.size()]));
 	}
 	
+	public char[] getChars() {
+		return chars;
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
 		if(position >= input.length()) return null;

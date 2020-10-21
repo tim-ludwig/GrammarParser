@@ -3,8 +3,8 @@ package me.tludwig.parsing.peg.expressions;
 import me.tludwig.parsing.peg.Match;
 
 public final class Predicate extends Expression {
-	private final Expression    expression;
-	private final PredicateType type;
+	private final Expression	expression;
+	private final PredicateType	type;
 	
 	private Predicate(final Expression expression, final PredicateType type) {
 		if(expression instanceof Predicate) throw new IllegalArgumentException("No predicates!");
@@ -19,6 +19,14 @@ public final class Predicate extends Expression {
 	
 	public static Predicate not(final Expression expression) {
 		return new Predicate(expression, PredicateType.NOT);
+	}
+	
+	public Expression getExpression() {
+		return expression;
+	}
+	
+	public PredicateType getType() {
+		return type;
 	}
 	
 	@Override

@@ -18,6 +18,10 @@ public class LiteralChar extends Expression {
 		return new LiteralChar((char) c);
 	}
 	
+	public char getChar() {
+		return c;
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
 		if(position >= input.length()) return null;
