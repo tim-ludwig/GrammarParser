@@ -9,7 +9,7 @@ public class ABNFParser extends PEGrammar {
 	}
 	
 	@Override
-	public void init() {
+	protected void init() {
 		//@formatter:off
 		def("rulelist",			oneOrMore(choice(def("rule"), seq(zeroOrMore(def("c-wsp")), def("c-nl")))));
 		def("rule",				seq(def("rulename"), def("defined-as"), def("elements"), def("c-nl")));
