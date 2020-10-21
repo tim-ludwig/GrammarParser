@@ -1,6 +1,8 @@
 package me.tludwig.parsing.peg;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import me.tludwig.parsing.peg.expressions.Choice;
@@ -17,7 +19,7 @@ import me.tludwig.parsing.peg.expressions.primaries.LiteralString;
 import me.tludwig.parsing.peg.expressions.primaries.NonTerminal;
 
 public abstract class PEGrammar {
-	public final HashMap<String, Expression>	definitions		= new HashMap<>();
+	private final HashMap<String, Expression>	definitions		= new HashMap<>();
 	private final HashMap<String, NonTerminal>	nonTerminals	= new HashMap<>();
 	private final NonTerminal					startSymbol;
 	
@@ -222,6 +224,18 @@ public abstract class PEGrammar {
 	
 	protected final EndOfFile EOF() {
 		return new EndOfFile();
+	}
+	
+	public final Map<String, Expression> getDefinitions() {
+		return Collections.unmodifiableMap(definitions);
+	}
+	
+	public final Map<String, NonTerminal> getNonTerminals() {
+		return Collections.unmodifiableMap(nonTerminals);
+	}
+	
+	public final NonTerminal getStartSymbol() {
+		return startSymbol;
 	}
 	
 	@Override

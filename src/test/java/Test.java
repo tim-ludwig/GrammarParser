@@ -22,7 +22,7 @@ public class Test {
 	public static void main(final String[] args) {
 		final PEGrammar parser = new PEGParser();
 		
-		for(final Entry<String, Expression> nonTerminal : parser.definitions.entrySet())
+		for(final Entry<String, Expression> nonTerminal : parser.getDefinitions().entrySet())
 			System.out.println(nonTerminal.getKey() + " <- " + nonTerminal.getValue());
 	}
 	

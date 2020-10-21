@@ -23,7 +23,7 @@ public class NonTerminal extends Expression {
 	
 	@Override
 	public Match match(final String input, final int position) {
-		final Match match = grammar.definitions.get(name).match(input, position);
+		final Match match = grammar.getDefinitions().get(name).match(input, position);
 		
 		if(match == null) return null;
 		

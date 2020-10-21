@@ -37,6 +37,7 @@ public final class Predicate extends Expression {
 	@Override
 	public String toString() {
 		final String s = "(" + expression + ")";
+		
 		if(type == PredicateType.AND) return '&' + s;
 		else if(type == PredicateType.NOT) return '!' + s;
 		
