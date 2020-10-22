@@ -30,14 +30,15 @@ public final class LiteralCharClass extends Expression {
 		while(m.find()) {
 			group = m.group();
 			
-			if(group.length() == 1) {
-				classes.add(LiteralCharClass.of(group.charAt(0)));
-			} else {
-				classes.add(LiteralCharClass.range(group.charAt(0), group.charAt(2)));
-			}
+			if(group.length() == 1) classes.add(LiteralCharClass.of(group.charAt(0)));
+			else classes.add(LiteralCharClass.range(group.charAt(0), group.charAt(2)));
 		}
 		
 		return LiteralCharClass.union(classes.toArray(new LiteralCharClass[classes.size()]));
+	}
+	
+	public char[] getChars() {
+		return chars;
 	}
 	
 	@Override
@@ -53,28 +54,27 @@ public final class LiteralCharClass extends Expression {
 	public static LiteralCharClass range(final char from, final char to) {
 		final char[] chars = new char[to - from + 1];
 		
-		for(int i = 0; i < chars.length; i++) {
+		for(int i = 0; i < chars.length; i++)
 			chars[i] = (char) (from + i);
-		}
 		
 		return new LiteralCharClass(chars);
+	}
+	
+	public static LiteralCharClass range(final int from, final int to) {
+		return range((char) from, (char) to);
 	}
 	
 	public static LiteralCharClass union(final LiteralCharClass... classes) {
 		final List<Character> chars = new LinkedList<>();
 		
-		for(final LiteralCharClass clazz : classes) {
+		for(final LiteralCharClass clazz : classes)
 			for(final char c : clazz.chars)
-				if(!chars.contains(c)) {
-					chars.add(c);
-				}
-		}
-		
+				if(!chars.contains(c)) chars.add(c);
+			
 		final char[] cArray = new char[chars.size()];
 		
-		for(int i = 0; i < cArray.length; i++) {
+		for(int i = 0; i < cArray.length; i++)
 			cArray[i] = chars.get(i);
-		}
 		
 		return new LiteralCharClass(cArray);
 	}
@@ -104,7 +104,7 @@ public final class LiteralCharClass extends Expression {
 	}
 	
 	public static LiteralCharClass ascii() {
-		return range((char) 0, (char) 0x7F);
+		return range(0, 0x7F);
 	}
 	
 	public static LiteralCharClass blank() {
@@ -112,7 +112,7 @@ public final class LiteralCharClass extends Expression {
 	}
 	
 	public static LiteralCharClass control() {
-		return union(range((char) 0, (char) 0x1F), of((char) 0x7F));
+		return union(range(0, 0x1F), of((char) 0x7F));
 	}
 	
 	public static LiteralCharClass whitespace() {
@@ -128,7 +128,7 @@ public final class LiteralCharClass extends Expression {
 	}
 	
 	public static LiteralCharClass graphical() {
-		return range((char) 0x21, (char) 0x7E);
+		return range(0x21, 0x7E);
 	}
 	
 	public static LiteralCharClass printable() {

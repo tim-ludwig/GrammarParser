@@ -3,8 +3,8 @@ package me.tludwig.parsing.peg.expressions;
 import me.tludwig.parsing.peg.Match;
 
 public final class Predicate extends Expression {
-	private final Expression    expression;
-	private final PredicateType type;
+	private final Expression	expression;
+	private final PredicateType	type;
 	
 	private Predicate(final Expression expression, final PredicateType type) {
 		if(expression instanceof Predicate) throw new IllegalArgumentException("No predicates!");
@@ -21,6 +21,14 @@ public final class Predicate extends Expression {
 		return new Predicate(expression, PredicateType.NOT);
 	}
 	
+	public Expression getExpression() {
+		return expression;
+	}
+	
+	public PredicateType getType() {
+		return type;
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
 		return expression.match(input, position);
@@ -29,6 +37,7 @@ public final class Predicate extends Expression {
 	@Override
 	public String toString() {
 		final String s = "(" + expression + ")";
+		
 		if(type == PredicateType.AND) return '&' + s;
 		else if(type == PredicateType.NOT) return '!' + s;
 		

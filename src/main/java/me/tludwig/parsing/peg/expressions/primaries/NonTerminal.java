@@ -5,8 +5,8 @@ import me.tludwig.parsing.peg.PEGrammar;
 import me.tludwig.parsing.peg.expressions.Expression;
 
 public class NonTerminal extends Expression {
-	private final String    name;
-	private final PEGrammar grammar;
+	private final String	name;
+	private final PEGrammar	grammar;
 	
 	private NonTerminal(final PEGrammar grammar, final String name) {
 		this.name = name;
@@ -21,9 +21,13 @@ public class NonTerminal extends Expression {
 		return name;
 	}
 	
+	public Expression getDefinition() {
+		return grammar.getDefinitions().get(name);
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
-		final Match match = grammar.definitions.get(name).match(input, position);
+		final Match match = getDefinition().match(input, position);
 		
 		if(match == null) return null;
 		

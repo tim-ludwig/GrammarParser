@@ -1,6 +1,7 @@
 package me.tludwig.parsing.peg.expressions;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,10 @@ public final class Choice extends Expression {
 		return new Choice(subExpressions);
 	}
 	
+	public List<Expression> getSubExpressions() {
+		return Collections.unmodifiableList(subExpressions);
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
 		Match match;
@@ -29,9 +34,7 @@ public final class Choice extends Expression {
 			match = sExp.match(input, position);
 			
 			if(sExp instanceof Predicate) {
-				if(!((Predicate) sExp).success(match)) {
-					continue;
-				}
+				if(!((Predicate) sExp).success(match)) continue;
 				
 				return new Match(this, position, "");
 			}

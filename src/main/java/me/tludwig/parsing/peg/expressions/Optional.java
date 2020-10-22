@@ -15,6 +15,10 @@ public final class Optional extends Expression {
 		return new Optional(expression);
 	}
 	
+	public Expression getExpression() {
+		return expression;
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
 		final Match match = expression.match(input, position);

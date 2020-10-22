@@ -1,6 +1,9 @@
 package me.tludwig.parsing.peg;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import me.tludwig.parsing.peg.expressions.Choice;
 import me.tludwig.parsing.peg.expressions.Expression;
@@ -16,8 +19,9 @@ import me.tludwig.parsing.peg.expressions.primaries.LiteralString;
 import me.tludwig.parsing.peg.expressions.primaries.NonTerminal;
 
 public abstract class PEGrammar {
-	public final HashMap<String, Expression> definitions = new HashMap<>();
-	private final NonTerminal                startSymbol;
+	private final HashMap<String, Expression>	definitions		= new HashMap<>();
+	private final HashMap<String, NonTerminal>	nonTerminals	= new HashMap<>();
+	private final NonTerminal					startSymbol;
 	
 	public PEGrammar(final String startSymbol) {
 		this.startSymbol = def(startSymbol);
@@ -25,93 +29,229 @@ public abstract class PEGrammar {
 		init();
 	}
 	
-	public abstract void init();
+	protected abstract void init();
 	
-	public Match match(final String input) {
+	public final Match match(final String input) {
 		return startSymbol.match(input, 0);
 	}
 	
-	public final void def(final String name, final Expression expression) {
+	protected final NonTerminal def(final String name, final Expression expression) {
 		definitions.put(name, expression);
+		
+		return def(name);
 	}
 	
-	public final NonTerminal def(final String name) {
-		return NonTerminal.of(this, name);
+	protected final NonTerminal def(final String name) {
+		return nonTerminals.computeIfAbsent(name, __ -> NonTerminal.of(this, name));
 	}
 	
-	public final Sequence seq(final Expression... expressions) {
+	protected final Sequence seq(final Expression... expressions) {
 		return Sequence.of(expressions);
 	}
 	
-	public final Choice choice(final Expression... expressions) {
+	protected final Choice choice(final Expression... expressions) {
 		return Choice.of(expressions);
 	}
 	
-	public final Repetition times(final Expression expression, final int n) {
+	protected final Repetition times(final Expression expression, final int n) {
 		return Repetition.times(expression, n);
 	}
 	
-	public final Repetition between(final Expression expression, final int min, final int max) {
+	protected final Repetition between(final Expression expression, final int min, final int max) {
 		return Repetition.between(expression, min, max);
 	}
 	
-	public final Repetition atLeast(final Expression expression, final int min) {
+	protected final Repetition atLeast(final Expression expression, final int min) {
 		return Repetition.atLeast(expression, min);
 	}
 	
-	public final Repetition atMost(final Expression expression, final int max) {
+	protected final Repetition atMost(final Expression expression, final int max) {
 		return Repetition.atMost(expression, max);
 	}
 	
-	public final Repetition zeroOrMore(final Expression expression) {
+	protected final Repetition zeroOrMore(final Expression expression) {
 		return Repetition.zeroOrMore(expression);
 	}
 	
-	public final Repetition oneOrMore(final Expression expression) {
+	protected final Repetition oneOrMore(final Expression expression) {
 		return Repetition.oneOrMore(expression);
 	}
 	
-	public final Optional opt(final Expression expression) {
+	protected final Optional opt(final Expression expression) {
 		return Optional.of(expression);
 	}
 	
-	public final Predicate and(final Expression expression) {
+	protected final Predicate and(final Expression expression) {
 		return Predicate.and(expression);
 	}
 	
-	public final Predicate not(final Expression expression) {
+	protected final Predicate not(final Expression expression) {
 		return Predicate.not(expression);
 	}
 	
-	public final LiteralChar character(final char c) {
+	protected final LiteralChar character(final char c) {
 		return LiteralChar.of(c);
 	}
 	
-	public final LiteralChar character(final int c) {
+	protected final LiteralChar character(final int c) {
 		return LiteralChar.of(c);
 	}
 	
-	public final LiteralString string(final String s) {
+	protected final LiteralString string(final String s) {
 		return LiteralString.of(s);
 	}
 	
-	public final LiteralCharClass list(final String def) {
+	protected final LiteralString CRLF() {
+		return string("\r\n");
+	}
+	
+	protected final LiteralCharClass list(final char... chars) {
+		return LiteralCharClass.of(chars);
+	}
+	
+	protected final LiteralCharClass list(final String def) {
 		return LiteralCharClass.of(def);
 	}
 	
-	public final LiteralCharClass range(final char from, final char to) {
+	protected final LiteralCharClass range(final char from, final char to) {
 		return LiteralCharClass.range(from, to);
 	}
 	
-	public final LiteralCharClass range(final int from, final int to) {
-		return LiteralCharClass.range((char) from, (char) to);
+	protected final LiteralCharClass range(final int from, final int to) {
+		return LiteralCharClass.range(from, to);
 	}
 	
-	public final LiteralAnyChar any() {
+	/**
+	 * [0-9]
+	 */
+	protected final LiteralCharClass digits() {
+		return LiteralCharClass.digits();
+	}
+	
+	/**
+	 * [0-9a-fA-F]
+	 */
+	protected final LiteralCharClass hexdigits() {
+		return LiteralCharClass.hexDigits();
+	}
+	
+	/**
+	 * [a-z]
+	 */
+	protected final LiteralCharClass lower() {
+		return LiteralCharClass.lower();
+	}
+	
+	/**
+	 * [A-Z]
+	 */
+	protected final LiteralCharClass upper() {
+		return LiteralCharClass.upper();
+	}
+	
+	/**
+	 * [a-zA-Z]
+	 */
+	protected final LiteralCharClass letters() {
+		return LiteralCharClass.letters();
+	}
+	
+	/**
+	 * [a-zA-Z0-9]
+	 */
+	protected final LiteralCharClass alnum() {
+		return LiteralCharClass.alnum();
+	}
+	
+	/**
+	 * [\x00-\x7F]
+	 */
+	protected final LiteralCharClass ascii() {
+		return LiteralCharClass.ascii();
+	}
+	
+	protected final LiteralCharClass blank() {
+		return LiteralCharClass.blank();
+	}
+	
+	/**
+	 * [\x00-\x1F\x7F]
+	 */
+	protected final LiteralCharClass control() {
+		return LiteralCharClass.control();
+	}
+	
+	protected final LiteralCharClass whitespace() {
+		return LiteralCharClass.whitespace();
+	}
+	
+	/**
+	 * [a-zA-Z0-9_]
+	 */
+	protected final LiteralCharClass wchars() {
+		return LiteralCharClass.wordCharacters();
+	}
+	
+	/**
+	 * [!-/:-@\[-`{-~]
+	 */
+	protected final LiteralCharClass punct() {
+		return LiteralCharClass.punctuation();
+	}
+	
+	/**
+	 * [\x21-\x7E]
+	 */
+	protected final LiteralCharClass graphical() {
+		return LiteralCharClass.graphical();
+	}
+	
+	/**
+	 * [\x21-\x7E]
+	 */
+	protected final LiteralCharClass visible() {
+		return LiteralCharClass.graphical();
+	}
+	
+	/**
+	 * [\x20-\x7E]
+	 */
+	protected final LiteralCharClass printable() {
+		return LiteralCharClass.printable();
+	}
+	
+	protected final LiteralAnyChar any() {
 		return new LiteralAnyChar();
 	}
 	
-	public final EndOfFile EOF() {
+	protected final EndOfFile EOF() {
 		return new EndOfFile();
+	}
+	
+	public final Map<String, Expression> getDefinitions() {
+		return Collections.unmodifiableMap(definitions);
+	}
+	
+	public final Map<String, NonTerminal> getNonTerminals() {
+		return Collections.unmodifiableMap(nonTerminals);
+	}
+	
+	public final NonTerminal getStartSymbol() {
+		return startSymbol;
+	}
+	
+	@Override
+	public final String toString() {
+		final StringBuilder builder = new StringBuilder();
+		
+		builder.append(buildRule(startSymbol));
+		builder.append("\n");
+		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol)).map(this::buildRule).collect(Collectors.joining("\n")));
+		
+		return builder.toString();
+	}
+	
+	private String buildRule(final NonTerminal nonTerminal) {
+		return nonTerminal + " <- " + nonTerminal.getDefinition();
 	}
 }

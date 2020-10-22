@@ -1,12 +1,13 @@
 package me.tludwig.parsing.peg;
 
 public class PEGParser extends PEGrammar {
+	
 	public PEGParser() {
 		super("Grammar");
 	}
 	
 	@Override
-	public void init() {
+	protected void init() {
 		//@formatter:off
 		def("Grammar", seq(def("Spacing"), oneOrMore(def("Definition")), and(EOF())));
 		def("Definition", seq(def("Identifier"), def("LEFTARROW"), def("Expression")));

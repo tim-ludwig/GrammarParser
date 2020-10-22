@@ -1,3 +1,5 @@
 .project
-/bin/
 .classpath
+
+/bin/
+/src/test/*/neo/

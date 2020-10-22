@@ -1,7 +1,6 @@
 package me.tludwig.parsing;
 
 import me.tludwig.parsing.peg.PEGrammar;
-import me.tludwig.parsing.peg.expressions.primaries.LiteralCharClass;
 
 public class ABNFParser extends PEGrammar {
 	
@@ -10,7 +9,7 @@ public class ABNFParser extends PEGrammar {
 	}
 	
 	@Override
-	public void init() {
+	protected void init() {
 		//@formatter:off
 		def("rulelist",			oneOrMore(choice(def("rule"), seq(zeroOrMore(def("c-wsp")), def("c-nl")))));
 		def("rule",				seq(def("rulename"), def("defined-as"), def("elements"), def("c-nl")));
@@ -39,17 +38,17 @@ public class ABNFParser extends PEGrammar {
 		def("BIT",		list("01"));
 		def("CHAR",		range(0x01, 0x7F));
 		def("CR",		character('\r'));
-		def("CRLF",		string("\r\n"));
-		def("CTL",		LiteralCharClass.control());
-		def("DIGIT",	LiteralCharClass.digits());
+		def("CRLF",		CRLF());
+		def("CTL",		control());
+		def("DIGIT",	digits());
 		def("DQUOTE",	character('"'));
-		def("HEXDIG",	LiteralCharClass.hexDigits());
+		def("HEXDIG",	hexdigits());
 		def("HTAB",		character('\t'));
 		def("LF",		character('\n'));
 		def("LWSP",		zeroOrMore(choice(def("WSP"), seq(def("CRLF"), def("WSP")))));
 		def("OCTET",	range(0x0, 0xFF));
 		def("SP",		character(' '));
-		def("VCHAR",	LiteralCharClass.graphical());
+		def("VCHAR",	visible());
 		def("WSP",		choice(def("SP"), def("HTAB")));
 		//@formatter:on
 	}
