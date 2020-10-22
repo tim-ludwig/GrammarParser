@@ -35,8 +35,10 @@ public abstract class PEGrammar {
 		return startSymbol.match(input, 0);
 	}
 	
-	protected final void def(final String name, final Expression expression) {
+	protected final NonTerminal def(final String name, final Expression expression) {
 		definitions.put(name, expression);
+		
+		return def(name);
 	}
 	
 	protected final NonTerminal def(final String name) {
@@ -250,6 +252,6 @@ public abstract class PEGrammar {
 	}
 	
 	private String buildRule(final NonTerminal nonTerminal) {
-		return nonTerminal + " <- " + definitions.get(nonTerminal.getName());
+		return nonTerminal + " <- " + nonTerminal.getDefinition();
 	}
 }

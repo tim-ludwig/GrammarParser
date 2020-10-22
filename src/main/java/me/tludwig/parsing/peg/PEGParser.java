@@ -1,6 +1,7 @@
 package me.tludwig.parsing.peg;
 
 public class PEGParser extends PEGrammar {
+	
 	public PEGParser() {
 		super("Grammar");
 	}

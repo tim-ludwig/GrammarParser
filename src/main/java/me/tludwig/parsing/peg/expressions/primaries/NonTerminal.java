@@ -21,9 +21,13 @@ public class NonTerminal extends Expression {
 		return name;
 	}
 	
+	public Expression getDefinition() {
+		return grammar.getDefinitions().get(name);
+	}
+	
 	@Override
 	public Match match(final String input, final int position) {
-		final Match match = grammar.getDefinitions().get(name).match(input, position);
+		final Match match = getDefinition().match(input, position);
 		
 		if(match == null) return null;
 		
