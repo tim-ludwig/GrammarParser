@@ -1,29 +1,28 @@
 package me.tludwig.parsing.peg.expressions;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import me.tludwig.parsing.peg.Match;
 
 public final class Choice extends Expression {
-	private final List<Expression> subExpressions;
+	private final Expression[] subExpressions;
 	
-	private Choice(final List<Expression> subExpressions) {
+	private Choice(final Expression[] subExpressions) {
 		this.subExpressions = subExpressions;
 	}
 	
 	public static Choice of(final Expression... subExpressions) {
-		return new Choice(Arrays.asList(subExpressions));
-	}
-	
-	public static Choice of(final List<Expression> subExpressions) {
 		return new Choice(subExpressions);
 	}
 	
-	public List<Expression> getSubExpressions() {
-		return Collections.unmodifiableList(subExpressions);
+	public static Choice of(final List<Expression> subExpressions) {
+		return new Choice(subExpressions.toArray(new Expression[subExpressions.size()]));
+	}
+	
+	public Expression[] getSubExpressions() {
+		return subExpressions;
 	}
 	
 	@Override
@@ -34,9 +33,7 @@ public final class Choice extends Expression {
 			match = sExp.match(input, position);
 			
 			if(sExp instanceof Predicate) {
-				if(!((Predicate) sExp).success(match)) {
-					continue;
-				}
+				if(!((Predicate) sExp).success(match)) continue;
 				
 				return new Match(this, position, "");
 			}
@@ -49,12 +46,10 @@ public final class Choice extends Expression {
 	
 	@Override
 	public String toString() {
-		return subExpressions.stream().map(expression -> {
+		return Arrays.stream(subExpressions).map(expression -> {
 			String s = expression.toString();
 			
-			if(expression instanceof Choice || expression instanceof Sequence) {
-				s = "(" + s + ")";
-			}
+			if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
 			
 			return s;
 		}).collect(Collectors.joining(" / "));

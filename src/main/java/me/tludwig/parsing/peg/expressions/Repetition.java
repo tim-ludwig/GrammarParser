@@ -1,6 +1,8 @@
 package me.tludwig.parsing.peg.expressions;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import me.tludwig.parsing.peg.Match;
 
@@ -54,7 +56,8 @@ public final class Repetition extends Expression {
 	
 	@Override
 	public Match match(final String input, final int position) {
-		final LinkedList<Match> subMatches = new LinkedList<>();
+		final List<Match> subMatches = max > 0 ? new ArrayList<>(max) : new LinkedList<>();
+		
 		Match match;
 		int cPos = position;
 		
@@ -62,9 +65,7 @@ public final class Repetition extends Expression {
 		for(; i < max || max < 0; i++) {
 			match = expression.match(input, cPos);
 			
-			if(match == null) {
-				break;
-			}
+			if(match == null) break;
 			
 			subMatches.add(match);
 			
@@ -80,9 +81,7 @@ public final class Repetition extends Expression {
 	public String toString() {
 		String s = expression.toString();
 		
-		if(expression instanceof Choice || expression instanceof Sequence) {
-			s = "(" + s + ")";
-		}
+		if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
 		
 		if(max == -1) {
 			if(min == 0) return s + '*';
