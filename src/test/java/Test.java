@@ -1,6 +1,6 @@
 import java.util.Map.Entry;
 
-import me.tludwig.parsing.peg.PEGParser;
+import me.tludwig.parsing.PEGParser;
 import me.tludwig.parsing.peg.PEGrammar;
 import me.tludwig.parsing.peg.expressions.Expression;
 

@@ -1,4 +1,6 @@
-package me.tludwig.parsing.peg;
+package me.tludwig.parsing;
+
+import me.tludwig.parsing.peg.PEGrammar;
 
 public class PEGParser extends PEGrammar {
 	

@@ -19,9 +19,9 @@ import me.tludwig.parsing.peg.expressions.primaries.LiteralString;
 import me.tludwig.parsing.peg.expressions.primaries.NonTerminal;
 
 public abstract class PEGrammar {
-	private final HashMap<String, Expression>	definitions		= new HashMap<>();
-	private final HashMap<String, NonTerminal>	nonTerminals	= new HashMap<>();
-	private final NonTerminal					startSymbol;
+	private final HashMap<String, Expression>  definitions  = new HashMap<>();
+	private final HashMap<String, NonTerminal> nonTerminals = new HashMap<>();
+	private final NonTerminal                  startSymbol;
 	
 	public PEGrammar(final String startSymbol) {
 		this.startSymbol = def(startSymbol);
@@ -246,7 +246,8 @@ public abstract class PEGrammar {
 		
 		builder.append(buildRule(startSymbol));
 		builder.append("\n");
-		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol)).map(this::buildRule).collect(Collectors.joining("\n")));
+		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol))
+				.map(this::buildRule).collect(Collectors.joining("\n")));
 		
 		return builder.toString();
 	}
