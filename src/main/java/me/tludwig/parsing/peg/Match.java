@@ -1,30 +1,29 @@
 package me.tludwig.parsing.peg;
 
-import java.util.Arrays;
 import java.util.List;
 
 import me.tludwig.parsing.peg.expressions.Expression;
 import me.tludwig.parsing.peg.expressions.primaries.NonTerminal;
 
 public final class Match {
-	private final Expression  expression;
-	private final int         pos;
-	private final String      matchedText;
-	private final List<Match> subMatches;
+	private final Expression expression;
+	private final int        pos;
+	private final String     matchedText;
+	private final Match[]    subMatches;
 	
-	public Match(final Expression expression, final int pos, final String matchedText, final List<Match> subMatches) {
+	public Match(final Expression expression, final int pos, final String matchedText, final Match[] subMatches) {
 		this.expression = expression;
 		this.pos = pos;
 		this.matchedText = matchedText;
 		this.subMatches = subMatches;
 	}
 	
-	public Match(final Expression expression, final int pos, final String matchedText, final Match... subMatches) {
-		this(expression, pos, matchedText, Arrays.asList(subMatches));
+	public Match(final Expression expression, final int pos, final String matchedText, final List<Match> subMatches) {
+		this(expression, pos, matchedText, subMatches.toArray(new Match[subMatches.size()]));
 	}
 	
 	public Match(final Expression expression, final int pos, final String matchedText) {
-		this(expression, pos, matchedText, (List<Match>) null);
+		this(expression, pos, matchedText, new Match[0]);
 	}
 	
 	public Expression getExpression() {
@@ -43,13 +42,13 @@ public final class Match {
 		return pos + matchedText.length();
 	}
 	
-	public List<Match> getSubMatches() {
+	public Match[] getSubMatches() {
 		return subMatches;
 	}
 	
 	@Override
 	public String toString() {
-//		return "Match[pos=" + pos + ", matchedText=\"" + matchedText + "\", subMatches=" + subMatches + "]";
+		//		return "Match[pos=" + pos + ", matchedText=\"" + matchedText + "\", subMatches=" + subMatches + "]";
 		final StringBuilder sb = new StringBuilder();
 		
 		string(sb, "");
@@ -78,12 +77,10 @@ public final class Match {
 		sb.append(pos);
 		sb.append("\n");
 		
-		if(subMatches != null) {
-			for(final Match subMatch : subMatches) {
-				subMatch.string(sb, indent + "\t");
-				
-				sb.append("\n");
-			}
+		if(subMatches != null) for(final Match subMatch : subMatches) {
+			subMatch.string(sb, indent + "\t");
+			
+			sb.append("\n");
 		}
 		
 		sb.append(indent);

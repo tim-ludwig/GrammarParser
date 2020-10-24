@@ -1,50 +1,50 @@
 package me.tludwig.parsing.peg.expressions;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import me.tludwig.parsing.peg.Match;
 
 public final class Sequence extends Expression {
-	private final List<Expression> subExpressions;
+	private final Expression[] subExpressions;
 	
-	private Sequence(final List<Expression> subExpressions) {
+	private Sequence(final Expression[] subExpressions) {
 		this.subExpressions = subExpressions;
 	}
 	
 	public static Sequence of(final Expression... subExpressions) {
-		return new Sequence(Arrays.asList(subExpressions));
-	}
-	
-	public static Sequence of(final List<Expression> subExpressions) {
 		return new Sequence(subExpressions);
 	}
 	
-	public List<Expression> getSubExpressions() {
-		return Collections.unmodifiableList(subExpressions);
+	public static Sequence of(final List<Expression> subExpressions) {
+		return new Sequence(subExpressions.toArray(new Expression[subExpressions.size()]));
+	}
+	
+	public Expression[] getSubExpressions() {
+		return subExpressions;
 	}
 	
 	@Override
 	public Match match(final String input, final int position) {
-		final LinkedList<Match> subMatches = new LinkedList<>();
-		Match match;
-		int cPos = position;
+		final Match[] subMatches = new Match[subExpressions.length];
 		
-		for(final Expression sExp : subExpressions) {
-			match = sExp.match(input, cPos);
+		int cPos = position;
+		Match match;
+		Expression exp;
+		for(int i = 0; i < subExpressions.length; i++) {
+			exp = subExpressions[i];
+			match = exp.match(input, cPos);
 			
-			if(sExp instanceof Predicate) {
-				if(!((Predicate) sExp).success(match)) return null;
+			if(exp instanceof Predicate) {
+				if(!((Predicate) exp).success(match)) return null;
 				
 				continue;
 			}
 			
 			if(match == null) return null; // fail state
 			
-			subMatches.add(match);
+			subMatches[i] = match;
 			
 			cPos = match.getEnd();
 		}
@@ -54,12 +54,10 @@ public final class Sequence extends Expression {
 	
 	@Override
 	public String toString() {
-		return subExpressions.stream().map(expression -> {
+		return Arrays.stream(subExpressions).map(expression -> {
 			String s = expression.toString();
 			
-			if(expression instanceof Choice || expression instanceof Sequence) {
-				s = "(" + s + ")";
-			}
+			if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
 			
 			return s;
 		}).collect(Collectors.joining(" "));
