@@ -54,6 +54,14 @@ public final class Sequence extends Expression {
 	
 	@Override
 	public String toString() {
-		return "(" + subExpressions.stream().map(Expression::toString).collect(Collectors.joining(" ")) + ")";
+		return subExpressions.stream().map(expression -> {
+			String s = expression.toString();
+			
+			if(expression instanceof Choice || expression instanceof Sequence) {
+				s = "(" + s + ")";
+			}
+			
+			return s;
+		}).collect(Collectors.joining(" "));
 	}
 }

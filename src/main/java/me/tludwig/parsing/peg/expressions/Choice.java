@@ -34,7 +34,9 @@ public final class Choice extends Expression {
 			match = sExp.match(input, position);
 			
 			if(sExp instanceof Predicate) {
-				if(!((Predicate) sExp).success(match)) continue;
+				if(!((Predicate) sExp).success(match)) {
+					continue;
+				}
 				
 				return new Match(this, position, "");
 			}
@@ -47,6 +49,14 @@ public final class Choice extends Expression {
 	
 	@Override
 	public String toString() {
-		return "(" + subExpressions.stream().map(Expression::toString).collect(Collectors.joining(" / ")) + ")";
+		return subExpressions.stream().map(expression -> {
+			String s = expression.toString();
+			
+			if(expression instanceof Choice || expression instanceof Sequence) {
+				s = "(" + s + ")";
+			}
+			
+			return s;
+		}).collect(Collectors.joining(" / "));
 	}
 }

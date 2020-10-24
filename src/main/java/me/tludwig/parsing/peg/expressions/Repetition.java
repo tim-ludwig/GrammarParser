@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import me.tludwig.parsing.peg.Match;
 
 public final class Repetition extends Expression {
-	private final int	min, max;
-	Expression			expression;
+	private final int min, max;
+	Expression        expression;
 	
 	private Repetition(final Expression expression, final int min, final int max) {
 		if(expression instanceof Predicate) throw new IllegalArgumentException("No predicates!");
@@ -62,7 +62,9 @@ public final class Repetition extends Expression {
 		for(; i < max || max < 0; i++) {
 			match = expression.match(input, cPos);
 			
-			if(match == null) break;
+			if(match == null) {
+				break;
+			}
 			
 			subMatches.add(match);
 			
@@ -76,7 +78,11 @@ public final class Repetition extends Expression {
 	
 	@Override
 	public String toString() {
-		final String s = "(" + expression + ")";
+		String s = expression.toString();
+		
+		if(expression instanceof Choice || expression instanceof Sequence) {
+			s = "(" + s + ")";
+		}
 		
 		if(max == -1) {
 			if(min == 0) return s + '*';
