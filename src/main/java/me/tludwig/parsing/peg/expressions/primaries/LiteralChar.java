@@ -31,8 +31,28 @@ public class LiteralChar extends Expression {
 		return null;
 	}
 	
+	private String escape() {
+		switch(c) {
+			case '\\':
+				return "\\\\";
+			case '\t':
+				return "\\t";
+			case '\n':
+				return "\\n";
+			case '\r':
+				return "\\r";
+			case '\f':
+				return "\\f";
+			case '\'':
+				return "\\'";
+			default:
+		}
+		
+		return "" + c;
+	}
+	
 	@Override
 	public String toString() {
-		return "'" + c + "'";
+		return "'" + escape() + "'";
 	}
 }

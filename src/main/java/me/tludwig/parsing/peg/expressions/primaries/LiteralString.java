@@ -25,8 +25,13 @@ public class LiteralString extends Expression {
 		return null;
 	}
 	
+	private String escape() {
+		return s.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\r", "\\r")
+				.replace("\f", "\\f").replace("\"", "\\\"");
+	}
+	
 	@Override
 	public String toString() {
-		return '"' + s + '"';
+		return '"' + escape() + '"';
 	}
 }
