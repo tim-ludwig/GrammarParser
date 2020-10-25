@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import me.tludwig.parsing.peg.Match;
+import me.tludwig.parsing.peg.ParseTree;
 
 public final class Repetition extends Expression {
 	private final int min, max;
@@ -55,26 +55,26 @@ public final class Repetition extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
-		final List<Match> subMatches = max > 0 ? new ArrayList<>(max) : new LinkedList<>();
+	public ParseTree parseTree(final String input, final int position) {
+		final List<ParseTree> subMatches = max > 0 ? new ArrayList<>(max) : new LinkedList<>();
 		
-		Match match;
+		ParseTree parseTree;
 		int cPos = position;
 		
 		int i = 0;
 		for(; i < max || max < 0; i++) {
-			match = expression.match(input, cPos);
+			parseTree = expression.parseTree(input, cPos);
 			
-			if(match == null) break;
+			if(parseTree == null) break;
 			
-			subMatches.add(match);
+			subMatches.add(parseTree);
 			
-			cPos = match.getEnd();
+			cPos = parseTree.getEnd();
 		}
 		
 		if(i < min) return null;
 		
-		return new Match(this, position, input.substring(position, cPos), subMatches);
+		return new ParseTree(this, position, input.substring(position, cPos), subMatches);
 	}
 	
 	@Override

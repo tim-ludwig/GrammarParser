@@ -1,6 +1,6 @@
 package me.tludwig.parsing.peg.expressions;
 
-import me.tludwig.parsing.peg.Match;
+import me.tludwig.parsing.peg.ParseTree;
 
 public final class Optional extends Expression {
 	private final Expression expression;
@@ -20,12 +20,12 @@ public final class Optional extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
-		final Match match = expression.match(input, position);
+	public ParseTree parseTree(final String input, final int position) {
+		final ParseTree parseTree = expression.parseTree(input, position);
 		
-		if(match == null) return new Match(this, position, "");
+		if(parseTree == null) return new ParseTree(this, position, "");
 		
-		return match;
+		return new ParseTree(this, position, parseTree.getMatchedText(), parseTree);
 	}
 	
 	@Override

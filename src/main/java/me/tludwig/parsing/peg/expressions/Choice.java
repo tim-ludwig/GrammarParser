@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import me.tludwig.parsing.peg.Match;
+import me.tludwig.parsing.peg.ParseTree;
 
 public final class Choice extends Expression {
 	private final Expression[] subExpressions;
@@ -26,19 +26,21 @@ public final class Choice extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
-		Match match;
+	public ParseTree parseTree(final String input, final int position) {
+		ParseTree parseTree;
 		
 		for(final Expression sExp : subExpressions) {
-			match = sExp.match(input, position);
+			parseTree = sExp.parseTree(input, position);
 			
 			if(sExp instanceof Predicate) {
-				if(!((Predicate) sExp).success(match)) continue;
+				if(!((Predicate) sExp).success(parseTree)) {
+					continue;
+				}
 				
-				return new Match(this, position, "");
+				return new ParseTree(this, position, "");
 			}
 			
-			if(match != null) return match;
+			if(parseTree != null) return new ParseTree(this, position, parseTree.getMatchedText(), parseTree);
 		}
 		
 		return null;
@@ -49,7 +51,9 @@ public final class Choice extends Expression {
 		return Arrays.stream(subExpressions).map(expression -> {
 			String s = expression.toString();
 			
-			if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
+			if(expression instanceof Choice || expression instanceof Sequence) {
+				s = "(" + s + ")";
+			}
 			
 			return s;
 		}).collect(Collectors.joining(" / "));

@@ -1,9 +1,8 @@
 package me.tludwig.parsing.peg.expressions.primaries;
 
-import me.tludwig.parsing.peg.Match;
-import me.tludwig.parsing.peg.expressions.Expression;
+import me.tludwig.parsing.peg.ParseTree;
 
-public class LiteralChar extends Expression {
+public class LiteralChar extends Primary {
 	private final char c;
 	
 	private LiteralChar(final char c) {
@@ -23,10 +22,10 @@ public class LiteralChar extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
+	public ParseTree parseTree(final String input, final int position) {
 		if(position >= input.length()) return null;
 		
-		if(input.charAt(position) == c) return new Match(this, position, String.valueOf(c));
+		if(input.charAt(position) == c) return new ParseTree(this, position, String.valueOf(c));
 		
 		return null;
 	}

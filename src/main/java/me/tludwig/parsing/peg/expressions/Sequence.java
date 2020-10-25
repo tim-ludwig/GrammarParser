@@ -1,10 +1,11 @@
 package me.tludwig.parsing.peg.expressions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import me.tludwig.parsing.peg.Match;
+import me.tludwig.parsing.peg.ParseTree;
 
 public final class Sequence extends Expression {
 	private final Expression[] subExpressions;
@@ -26,30 +27,28 @@ public final class Sequence extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
-		final Match[] subMatches = new Match[subExpressions.length];
+	public ParseTree parseTree(final String input, final int position) {
+		final List<ParseTree> subMatches = new ArrayList<>(subExpressions.length);
 		
 		int cPos = position;
-		Match match;
-		Expression exp;
-		for(int i = 0; i < subExpressions.length; i++) {
-			exp = subExpressions[i];
-			match = exp.match(input, cPos);
+		ParseTree parseTree = null;
+		for(final Expression exp : subExpressions) {
+			parseTree = exp.parseTree(input, cPos);
 			
 			if(exp instanceof Predicate) {
-				if(!((Predicate) exp).success(match)) return null;
+				if(!((Predicate) exp).success(parseTree)) return null;
 				
 				continue;
 			}
 			
-			if(match == null) return null; // fail state
+			if(parseTree == null) return null; // fail state
 			
-			subMatches[i] = match;
+			subMatches.add(parseTree);
 			
-			cPos = match.getEnd();
+			cPos = parseTree.getEnd();
 		}
 		
-		return new Match(this, position, input.substring(position, cPos), subMatches);
+		return new ParseTree(this, position, input.substring(position, cPos), subMatches);
 	}
 	
 	@Override
@@ -57,7 +56,9 @@ public final class Sequence extends Expression {
 		return Arrays.stream(subExpressions).map(expression -> {
 			String s = expression.toString();
 			
-			if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
+			if(expression instanceof Choice || expression instanceof Sequence) {
+				s = "(" + s + ")";
+			}
 			
 			return s;
 		}).collect(Collectors.joining(" "));

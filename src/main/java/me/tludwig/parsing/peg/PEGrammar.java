@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import me.tludwig.parsing.peg.ast.ASTRule;
+import me.tludwig.parsing.peg.ast.AbstractSyntaxTree;
 import me.tludwig.parsing.peg.expressions.Choice;
 import me.tludwig.parsing.peg.expressions.Expression;
+import me.tludwig.parsing.peg.expressions.NonTerminal;
 import me.tludwig.parsing.peg.expressions.Optional;
 import me.tludwig.parsing.peg.expressions.Predicate;
 import me.tludwig.parsing.peg.expressions.Repetition;
@@ -16,11 +19,11 @@ import me.tludwig.parsing.peg.expressions.primaries.LiteralAnyChar;
 import me.tludwig.parsing.peg.expressions.primaries.LiteralChar;
 import me.tludwig.parsing.peg.expressions.primaries.LiteralCharClass;
 import me.tludwig.parsing.peg.expressions.primaries.LiteralString;
-import me.tludwig.parsing.peg.expressions.primaries.NonTerminal;
 
 public abstract class PEGrammar {
-	private final HashMap<String, Expression>  definitions  = new HashMap<>();
-	private final HashMap<String, NonTerminal> nonTerminals = new HashMap<>();
+	private final HashMap<String, Expression>  definitions        = new HashMap<>();
+	private final HashMap<String, NonTerminal> nonTerminals       = new HashMap<>();
+	private final HashMap<String, ASTRule>     astConversionRules = new HashMap<>();
 	private final NonTerminal                  startSymbol;
 	
 	public PEGrammar(final String startSymbol) {
@@ -31,8 +34,18 @@ public abstract class PEGrammar {
 	
 	protected abstract void init();
 	
-	public final Match match(final String input) {
-		return startSymbol.match(input, 0);
+	public final AbstractSyntaxTree abstracSyntaxTree(final String input) {
+		return AbstractSyntaxTree.createAST(parseTree(input), astConversionRules);
+	}
+	
+	public final ParseTree parseTree(final String input) {
+		return startSymbol.parseTree(input, 0);
+	}
+	
+	protected final NonTerminal def(final String name, final ASTRule rule, final Expression expression) {
+		astConversionRules.put(name, rule);
+		
+		return def(name, expression);
 	}
 	
 	protected final NonTerminal def(final String name, final Expression expression) {

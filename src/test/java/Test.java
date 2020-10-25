@@ -1,26 +1,34 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import me.tludwig.parsing.PEGParser;
 import me.tludwig.parsing.peg.PEGrammar;
+import me.tludwig.parsing.peg.ParseTree;
 
 public class Test {
-	// public static void main(final String[] args) throws IOException {
-	// final PEGrammar parser = new ABNFParser();
-	//
-	// String text = "";
-	//
-	// for(final String line : Files.readAllLines(Paths.get("bin/selfdefin.abnf"))) {
-	// text += line + "\r\n";
-	// }
-	//
-	// System.out.println(text);
-	//
-	// System.out.println(parser.match(text));
-	// }
-	
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		final PEGrammar parser = new PEGParser();
 		
-		System.out.println(parser.toString());
+		String text = "";
+		
+		for(final String line : Files.readAllLines(Paths.get("bin/selfdefinitionPEG.txt"))) {
+			text += line + "\r\n";
+		}
+		
+		final ParseTree parseTree = parser.parseTree(text);
+		System.out.println(text);
+		System.out.println(parseTree);
+		System.out.println(text);
+		System.out.println(parser.abstracSyntaxTree(text));
+		
 	}
+	
+//	public static void main(final String[] args) {
+//		final PEGrammar parser = new PEGParser();
+//
+//		System.out.println(parser.toString());
+//	}
 	
 	// public static void main(final String[] args) {
 	// final ANBN anbn = new ANBN();
@@ -36,7 +44,7 @@ public class Test {
 	
 	private static void test(final String input, final PEGrammar parser) {
 		System.out.println(input);
-		System.out.println(parser.match(input));
+		System.out.println(parser.parseTree(input));
 	}
 	
 	public static class ANBN extends PEGrammar {

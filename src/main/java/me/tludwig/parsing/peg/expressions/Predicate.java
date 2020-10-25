@@ -1,6 +1,6 @@
 package me.tludwig.parsing.peg.expressions;
 
-import me.tludwig.parsing.peg.Match;
+import me.tludwig.parsing.peg.ParseTree;
 
 public final class Predicate extends Expression {
 	private final Expression    expression;
@@ -30,8 +30,8 @@ public final class Predicate extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
-		return expression.match(input, position);
+	public ParseTree parseTree(final String input, final int position) {
+		return expression.parseTree(input, position);
 	}
 	
 	@Override
@@ -48,20 +48,20 @@ public final class Predicate extends Expression {
 		return s;
 	}
 	
-	public boolean success(final Match match) {
-		return type.success(match);
+	public boolean success(final ParseTree parseTree) {
+		return type.success(parseTree);
 	}
 	
 	public enum PredicateType {
 		AND,
 		NOT;
 		
-		public boolean success(final Match match) {
+		public boolean success(final ParseTree parseTree) {
 			switch(this) {
 				case AND:
-					return match != null;
+					return parseTree != null;
 				case NOT:
-					return match == null;
+					return parseTree == null;
 			}
 			return false;
 		}

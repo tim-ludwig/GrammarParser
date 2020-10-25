@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.tludwig.parsing.peg.Match;
-import me.tludwig.parsing.peg.expressions.Expression;
+import me.tludwig.parsing.peg.ParseTree;
 
-public final class LiteralCharClass extends Expression {
+public final class LiteralCharClass extends Primary {
 	private final char[] chars;
 	
 	private LiteralCharClass(final char... chars) {
@@ -30,8 +29,11 @@ public final class LiteralCharClass extends Expression {
 		while(m.find()) {
 			group = m.group();
 			
-			if(group.length() == 1) classes.add(LiteralCharClass.of(group.charAt(0)));
-			else classes.add(LiteralCharClass.range(group.charAt(0), group.charAt(2)));
+			if(group.length() == 1) {
+				classes.add(LiteralCharClass.of(group.charAt(0)));
+			} else {
+				classes.add(LiteralCharClass.range(group.charAt(0), group.charAt(2)));
+			}
 		}
 		
 		return LiteralCharClass.union(classes.toArray(new LiteralCharClass[classes.size()]));
@@ -42,11 +44,11 @@ public final class LiteralCharClass extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
+	public ParseTree parseTree(final String input, final int position) {
 		if(position >= input.length()) return null;
 		
 		for(final char c : chars)
-			if(input.charAt(position) == c) return new Match(this, position, String.valueOf(c));
+			if(input.charAt(position) == c) return new ParseTree(this, position, String.valueOf(c));
 		
 		return null;
 	}
@@ -54,8 +56,9 @@ public final class LiteralCharClass extends Expression {
 	public static LiteralCharClass range(final char from, final char to) {
 		final char[] chars = new char[to - from + 1];
 		
-		for(int i = 0; i < chars.length; i++)
+		for(int i = 0; i < chars.length; i++) {
 			chars[i] = (char) (from + i);
+		}
 		
 		return new LiteralCharClass(chars);
 	}
@@ -67,14 +70,18 @@ public final class LiteralCharClass extends Expression {
 	public static LiteralCharClass union(final LiteralCharClass... classes) {
 		final List<Character> chars = new LinkedList<>();
 		
-		for(final LiteralCharClass clazz : classes)
+		for(final LiteralCharClass clazz : classes) {
 			for(final char c : clazz.chars)
-				if(!chars.contains(c)) chars.add(c);
-			
+				if(!chars.contains(c)) {
+					chars.add(c);
+				}
+		}
+		
 		final char[] cArray = new char[chars.size()];
 		
-		for(int i = 0; i < cArray.length; i++)
+		for(int i = 0; i < cArray.length; i++) {
 			cArray[i] = chars.get(i);
+		}
 		
 		return new LiteralCharClass(cArray);
 	}

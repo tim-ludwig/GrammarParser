@@ -1,9 +1,8 @@
 package me.tludwig.parsing.peg.expressions.primaries;
 
-import me.tludwig.parsing.peg.Match;
-import me.tludwig.parsing.peg.expressions.Expression;
+import me.tludwig.parsing.peg.ParseTree;
 
-public class LiteralString extends Expression {
+public class LiteralString extends Primary {
 	private final String s;
 	
 	private LiteralString(final String s) {
@@ -19,8 +18,8 @@ public class LiteralString extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
-		if(input.regionMatches(position, s, 0, s.length())) return new Match(this, position, s);
+	public ParseTree parseTree(final String input, final int position) {
+		if(input.regionMatches(position, s, 0, s.length())) return new ParseTree(this, position, s);
 		
 		return null;
 	}

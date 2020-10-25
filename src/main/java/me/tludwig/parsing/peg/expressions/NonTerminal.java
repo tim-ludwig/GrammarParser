@@ -1,12 +1,11 @@
-package me.tludwig.parsing.peg.expressions.primaries;
+package me.tludwig.parsing.peg.expressions;
 
-import me.tludwig.parsing.peg.Match;
 import me.tludwig.parsing.peg.PEGrammar;
-import me.tludwig.parsing.peg.expressions.Expression;
+import me.tludwig.parsing.peg.ParseTree;
 
 public class NonTerminal extends Expression {
-	private final String	name;
-	private final PEGrammar	grammar;
+	private final String    name;
+	private final PEGrammar grammar;
 	
 	private NonTerminal(final PEGrammar grammar, final String name) {
 		this.name = name;
@@ -26,12 +25,12 @@ public class NonTerminal extends Expression {
 	}
 	
 	@Override
-	public Match match(final String input, final int position) {
-		final Match match = getDefinition().match(input, position);
+	public ParseTree parseTree(final String input, final int position) {
+		final ParseTree parseTree = getDefinition().parseTree(input, position);
 		
-		if(match == null) return null;
+		if(parseTree == null) return null;
 		
-		return new Match(this, match.getPos(), match.getMatchedText(), match.getSubMatches());
+		return new ParseTree(this, parseTree.getPos(), parseTree.getMatchedText(), parseTree);
 	}
 	
 	@Override
