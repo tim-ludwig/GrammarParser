@@ -1,5 +1,6 @@
 package me.tludwig.parsing.peg.expressions;
 
+import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public final class Predicate extends Expression {
@@ -11,6 +12,10 @@ public final class Predicate extends Expression {
 		
 		this.expression = expression;
 		this.type = type;
+	}
+	
+	public static Predicate of(final Expression expression, final PredicateType type) {
+		return new Predicate(expression, type);
 	}
 	
 	public static Predicate and(final Expression expression) {
@@ -35,12 +40,15 @@ public final class Predicate extends Expression {
 	}
 	
 	@Override
+	public ExpressionType type() {
+		return ExpressionType.PREDICATE;
+	}
+	
+	@Override
 	public String toString() {
 		String s = expression.toString();
 		
-		if(expression instanceof Choice || expression instanceof Sequence) {
-			s = "(" + s + ")";
-		}
+		if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
 		
 		if(type == PredicateType.AND) return '&' + s;
 		else if(type == PredicateType.NOT) return '!' + s;
@@ -53,8 +61,14 @@ public final class Predicate extends Expression {
 	}
 	
 	public enum PredicateType {
-		AND,
-		NOT;
+		AND(0),
+		NOT(1);
+		
+		private final byte id;
+		
+		private PredicateType(final int id) {
+			this.id = (byte) id;
+		}
 		
 		public boolean success(final ParseTree parseTree) {
 			switch(this) {
@@ -63,7 +77,16 @@ public final class Predicate extends Expression {
 				case NOT:
 					return parseTree == null;
 			}
+			
 			return false;
+		}
+		
+		public byte getId() {
+			return id;
+		}
+		
+		public static PredicateType getById(final int id) {
+			return id == 0 ? AND : id == 1 ? NOT : null;
 		}
 	}
 }

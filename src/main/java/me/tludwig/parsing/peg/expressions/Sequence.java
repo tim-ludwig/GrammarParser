@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public final class Sequence extends Expression {
@@ -52,13 +53,16 @@ public final class Sequence extends Expression {
 	}
 	
 	@Override
+	public ExpressionType type() {
+		return ExpressionType.SEQUENCE;
+	}
+	
+	@Override
 	public String toString() {
 		return Arrays.stream(subExpressions).map(expression -> {
 			String s = expression.toString();
 			
-			if(expression instanceof Choice || expression instanceof Sequence) {
-				s = "(" + s + ")";
-			}
+			if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
 			
 			return s;
 		}).collect(Collectors.joining(" "));

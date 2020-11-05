@@ -1,5 +1,6 @@
 package me.tludwig.parsing.peg.expressions.primaries;
 
+import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public class LiteralChar extends Primary {
@@ -30,6 +31,16 @@ public class LiteralChar extends Primary {
 		return null;
 	}
 	
+	@Override
+	public ExpressionType type() {
+		return ExpressionType.CHAR;
+	}
+	
+	@Override
+	public String toString() {
+		return "'" + escape() + "'";
+	}
+	
 	private String escape() {
 		switch(c) {
 			case '\\':
@@ -48,10 +59,5 @@ public class LiteralChar extends Primary {
 		}
 		
 		return "" + c;
-	}
-	
-	@Override
-	public String toString() {
-		return "'" + escape() + "'";
 	}
 }

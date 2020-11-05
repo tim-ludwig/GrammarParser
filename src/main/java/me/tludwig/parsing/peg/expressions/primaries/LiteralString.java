@@ -1,5 +1,6 @@
 package me.tludwig.parsing.peg.expressions.primaries;
 
+import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public class LiteralString extends Primary {
@@ -24,13 +25,17 @@ public class LiteralString extends Primary {
 		return null;
 	}
 	
-	private String escape() {
-		return s.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\r", "\\r")
-				.replace("\f", "\\f").replace("\"", "\\\"");
+	@Override
+	public ExpressionType type() {
+		return ExpressionType.STRING;
 	}
 	
 	@Override
 	public String toString() {
 		return '"' + escape() + '"';
+	}
+	
+	private String escape() {
+		return s.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\r", "\\r").replace("\f", "\\f").replace("\"", "\\\"");
 	}
 }
