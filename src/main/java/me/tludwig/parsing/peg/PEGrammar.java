@@ -34,7 +34,7 @@ public abstract class PEGrammar {
 	
 	protected abstract void init();
 	
-	public final AbstractSyntaxTree abstracSyntaxTree(final String input) {
+	public final AbstractSyntaxTree abstractSyntaxTree(final String input) {
 		return AbstractSyntaxTree.createAST(parseTree(input), astConversionRules);
 	}
 	

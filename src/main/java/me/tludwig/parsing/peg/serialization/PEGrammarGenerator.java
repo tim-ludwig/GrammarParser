@@ -39,7 +39,7 @@ public class PEGrammarGenerator {
 	public PEGrammarGenerator generate() {
 		try {
 			final PEGrammarParser parser = new PEGrammarParser();
-			final AbstractSyntaxTree grammarAST = parser.abstracSyntaxTree(text);
+			final AbstractSyntaxTree grammarAST = parser.abstractSyntaxTree(text);
 			
 			String defName;
 			for(final AbstractSyntaxTree ast : grammarAST.getChildren()) {

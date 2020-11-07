@@ -20,7 +20,7 @@ public class Test {
 		System.out.println(text);
 		System.out.println(parseTree);
 		System.out.println(text);
-		System.out.println(parser.abstracSyntaxTree(text));
+		System.out.println(parser.abstractSyntaxTree(text));
 		
 	}
 	
