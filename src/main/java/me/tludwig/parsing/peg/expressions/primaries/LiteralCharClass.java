@@ -23,7 +23,6 @@ public final class LiteralCharClass extends Primary {
 		if(!def.matches("(.-.|.)+")) return null;
 		
 		final Matcher m = Pattern.compile("(.-.|.)").matcher(def);
-		
 		final LinkedList<LiteralCharClass> classes = new LinkedList<>();
 		
 		String group;

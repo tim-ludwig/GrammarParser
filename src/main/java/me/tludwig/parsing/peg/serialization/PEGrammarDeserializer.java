@@ -109,7 +109,7 @@ public class PEGrammarDeserializer {
 	}
 	
 	public PEGrammar getGrammar() {
-		if(grammar == null) throw new IllegalStateException("Grammar is not deserialized yet! Please deserialize before using.");
+		if(grammar == null) deserialize();
 		
 		return grammar;
 	}

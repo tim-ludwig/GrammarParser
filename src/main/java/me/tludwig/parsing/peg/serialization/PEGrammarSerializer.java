@@ -127,7 +127,7 @@ public final class PEGrammarSerializer {
 	}
 	
 	public PEGrammarSerializer write(final OutputStream out, final boolean closeStream) throws IOException {
-		if(bytes == null) throw new IllegalStateException("Grammar is not serialized yet! Please serialize before writing.");
+		if(bytes == null) serialize();
 		
 		out.write(bytes);
 		out.flush();

@@ -123,7 +123,7 @@ public class PEGrammarGenerator {
 	}
 	
 	public PEGrammar getGrammar() {
-		if(grammar == null) throw new IllegalStateException("Grammar is not generated yet!");
+		if(grammar == null) generate();
 		
 		return grammar;
 	}
