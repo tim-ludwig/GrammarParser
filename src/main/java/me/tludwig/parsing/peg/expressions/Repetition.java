@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public final class Repetition extends Expression {
 	private final int min, max;
+	
 	Expression        expression;
 	
 	private Repetition(final Expression expression, final int min, final int max) {
@@ -78,6 +80,11 @@ public final class Repetition extends Expression {
 	}
 	
 	@Override
+	public ExpressionType type() {
+		return ExpressionType.REPETITION;
+	}
+	
+	@Override
 	public String toString() {
 		String s = expression.toString();
 		
@@ -94,5 +101,4 @@ public final class Repetition extends Expression {
 		
 		return s + "{" + min + ", " + max + "}";
 	}
-	
 }

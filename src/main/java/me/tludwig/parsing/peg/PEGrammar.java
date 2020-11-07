@@ -249,6 +249,10 @@ public abstract class PEGrammar {
 		return Collections.unmodifiableMap(nonTerminals);
 	}
 	
+	public final Map<String, ASTRule> getASTConversionRules() {
+		return Collections.unmodifiableMap(astConversionRules);
+	}
+	
 	public final NonTerminal getStartSymbol() {
 		return startSymbol;
 	}
@@ -259,8 +263,7 @@ public abstract class PEGrammar {
 		
 		builder.append(buildRule(startSymbol));
 		builder.append("\n");
-		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol))
-				.map(this::buildRule).collect(Collectors.joining("\n")));
+		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol)).map(this::buildRule).collect(Collectors.joining("\n")));
 		
 		return builder.toString();
 	}

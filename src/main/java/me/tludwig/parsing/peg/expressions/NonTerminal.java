@@ -1,5 +1,6 @@
 package me.tludwig.parsing.peg.expressions;
 
+import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.PEGrammar;
 import me.tludwig.parsing.peg.ParseTree;
 
@@ -31,6 +32,11 @@ public class NonTerminal extends Expression {
 		if(parseTree == null) return null;
 		
 		return new ParseTree(this, parseTree.getPos(), parseTree.getMatchedText(), parseTree);
+	}
+	
+	@Override
+	public ExpressionType type() {
+		return ExpressionType.NON_TERMINAL;
 	}
 	
 	@Override
