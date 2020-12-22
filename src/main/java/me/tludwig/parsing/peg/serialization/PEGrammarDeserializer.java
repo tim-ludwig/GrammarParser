@@ -10,28 +10,24 @@ import java.util.Arrays;
 
 import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.PEGrammar;
-import me.tludwig.parsing.peg.expressions.Choice;
 import me.tludwig.parsing.peg.expressions.Expression;
-import me.tludwig.parsing.peg.expressions.Optional;
+import me.tludwig.parsing.peg.expressions.Predicate;
 import me.tludwig.parsing.peg.expressions.Predicate.PredicateType;
-import me.tludwig.parsing.peg.expressions.Sequence;
 import me.tludwig.parsing.peg.expressions.primaries.EndOfFile;
-import me.tludwig.parsing.peg.expressions.primaries.LiteralAnyChar;
-import me.tludwig.parsing.peg.expressions.primaries.LiteralChar;
-import me.tludwig.parsing.peg.expressions.primaries.LiteralCharClass;
-import me.tludwig.parsing.peg.expressions.primaries.LiteralString;
 
 public class PEGrammarDeserializer {
-	public static final byte[]         MAGIC_BYTES = PEGrammarSerializer.MAGIC_BYTES;
+	public static final byte[] MAGIC_BYTES = PEGrammarSerializer.MAGIC_BYTES;
 	
 	private final ByteArrayInputStream bais;
 	
-	private GeneratedGrammar           grammar;
+	private PEGrammar grammar;
 	
 	public PEGrammarDeserializer(final InputStream in, final boolean closeStream) throws IOException {
 		bais = new ByteArrayInputStream(in.readAllBytes());
 		
-		if(closeStream) in.close();
+		if(closeStream) {
+			in.close();
+		}
 	}
 	
 	public PEGrammarDeserializer(final InputStream in) throws IOException {
@@ -50,66 +46,77 @@ public class PEGrammarDeserializer {
 		if(Arrays.compare(read(MAGIC_BYTES.length), MAGIC_BYTES) != 0) throw new IllegalStateException("");
 		
 		try {
-			grammar = new GeneratedGrammar(readString());
-			
-			final int defCount = readInt();
-			for(int i = 0; i < defCount; i++)
-				grammar.definition(readString(), deserializeExpression());
-		}catch(final Exception e) {
+			grammar = new PEGrammar(readString()) {
+				@Override
+				protected void init() {
+					final int defCount = readInt();
+					for(int i = 0; i < defCount; i++) {
+						def(readString(), deserializeExpression());
+					}
+				}
+				
+				private Expression deserializeExpression() {
+					final ExpressionType type = ExpressionType.getById(read());
+					
+					switch(type) {
+						case ANY_CHAR:
+							return any();
+						case CHAR:
+							return character(readChar());
+						case CHAR_CLASS:
+							final char[] chars = new char[readInt()];
+							
+							for(int i = 0; i < chars.length; i++) {
+								chars[i] = readChar();
+							}
+							
+							return list(chars);
+						case CHOICE:
+							final Expression[] sub = new Expression[readInt()];
+							
+							for(int i = 0; i < sub.length; i++) {
+								sub[i] = deserializeExpression();
+							}
+							
+							return choice(sub);
+						case EOF:
+							return new EndOfFile();
+						case NON_TERMINAL:
+							return def(readString());
+						case OPTIONAL:
+							return opt(deserializeExpression());
+						case PREDICATE:
+							byte predicateType = read();
+							return Predicate.of(deserializeExpression(), PredicateType.getById(predicateType));
+						case REPETITION:
+							int min = readInt(), max = readInt();
+							return between(deserializeExpression(), min, max);
+						case SEQUENCE:
+							final Expression[] sub2 = new Expression[readInt()];
+							
+							for(int i = 0; i < sub2.length; i++) {
+								sub2[i] = deserializeExpression();
+							}
+							
+							return seq(sub2);
+						case STRING:
+							return string(readString());
+					}
+					
+					return null;
+				}
+			};
+		} catch(final Exception e) {
 			grammar = null;
 		}
 		
 		return this;
 	}
 	
-	private Expression deserializeExpression() {
-		final ExpressionType type = ExpressionType.getById(read());
-		
-		switch(type) {
-			case ANY_CHAR:
-				return new LiteralAnyChar();
-			case CHAR:
-				return LiteralChar.of(readChar());
-			case CHAR_CLASS:
-				final char[] chars = new char[readInt()];
-				
-				for(int i = 0; i < chars.length; i++)
-					chars[i] = readChar();
-				
-				return LiteralCharClass.of(chars);
-			case CHOICE:
-				final Expression[] sub = new Expression[readInt()];
-				
-				for(int i = 0; i < sub.length; i++)
-					sub[i] = deserializeExpression();
-				
-				return Choice.of(sub);
-			case EOF:
-				return new EndOfFile();
-			case NON_TERMINAL:
-				return grammar.definition(readString());
-			case OPTIONAL:
-				return Optional.of(deserializeExpression());
-			case PREDICATE:
-				return grammar.predicate(PredicateType.getById(read()), deserializeExpression());
-			case REPETITION:
-				return grammar.repetition(readInt(), readInt(), deserializeExpression());
-			case SEQUENCE:
-				final Expression[] sub2 = new Expression[readInt()];
-				
-				for(int i = 0; i < sub2.length; i++)
-					sub2[i] = deserializeExpression();
-				
-				return Sequence.of(sub2);
-			case STRING:
-				return LiteralString.of(readString());
-		}
-		
-		return null;
-	}
-	
 	public PEGrammar getGrammar() {
-		if(grammar == null) deserialize();
+		if(grammar == null) {
+			deserialize();
+		}
 		
 		return grammar;
 	}

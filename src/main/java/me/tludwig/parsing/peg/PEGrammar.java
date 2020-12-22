@@ -32,7 +32,7 @@ public abstract class PEGrammar {
 		init();
 	}
 	
-	protected abstract void init();
+	protected void init() {}
 	
 	public final AbstractSyntaxTree abstractSyntaxTree(final String input) {
 		return AbstractSyntaxTree.createAST(parseTree(input), astConversionRules);
@@ -263,7 +263,8 @@ public abstract class PEGrammar {
 		
 		builder.append(buildRule(startSymbol));
 		builder.append("\n");
-		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol)).map(this::buildRule).collect(Collectors.joining("\n")));
+		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol))
+				.map(this::buildRule).collect(Collectors.joining("\n")));
 		
 		return builder.toString();
 	}

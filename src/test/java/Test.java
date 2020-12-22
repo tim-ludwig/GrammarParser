@@ -12,7 +12,7 @@ public class Test {
 		
 		String text = "";
 		
-		for(final String line : Files.readAllLines(Paths.get("bin/selfdefinitionPEG.txt"))) {
+		for(final String line : Files.readAllLines(Paths.get("target/test-classes/selfdefinitionPEG.txt"))) {
 			text += line + "\r\n";
 		}
 		
@@ -21,7 +21,6 @@ public class Test {
 		System.out.println(parseTree);
 		System.out.println(text);
 		System.out.println(parser.abstractSyntaxTree(text));
-		
 	}
 	
 //	public static void main(final String[] args) {

@@ -6,10 +6,7 @@ public class ABNFParser extends PEGrammar {
 	
 	public ABNFParser() {
 		super("rulelist");
-	}
-	
-	@Override
-	protected void init() {
+		
 		//@formatter:off
 		def("rulelist",			oneOrMore(choice(def("rule"), seq(zeroOrMore(def("c-wsp")), def("c-nl")))));
 		def("rule",				seq(def("rulename"), def("defined-as"), def("elements"), def("c-nl")));
