@@ -10,7 +10,7 @@ import me.tludwig.parsing.peg.ParseTree;
 public final class Repetition extends Expression {
 	private final int min, max;
 	
-	Expression        expression;
+	Expression expression;
 	
 	private Repetition(final Expression expression, final int min, final int max) {
 		if(expression instanceof Predicate) throw new IllegalArgumentException("No predicates!");
@@ -67,7 +67,9 @@ public final class Repetition extends Expression {
 		for(; i < max || max < 0; i++) {
 			parseTree = expression.parseTree(input, cPos);
 			
-			if(parseTree == null) break;
+			if(parseTree == null) {
+				break;
+			}
 			
 			subMatches.add(parseTree);
 			
@@ -88,7 +90,9 @@ public final class Repetition extends Expression {
 	public String toString() {
 		String s = expression.toString();
 		
-		if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
+		if(expression instanceof Choice || expression instanceof Sequence) {
+			s = "(" + s + ")";
+		}
 		
 		if(max == -1) {
 			if(min == 0) return s + '*';

@@ -22,12 +22,12 @@ import me.tludwig.parsing.peg.expressions.primaries.LiteralCharClass;
 import me.tludwig.parsing.peg.expressions.primaries.LiteralString;
 
 public final class PEGrammarSerializer {
-	public static final byte[]          MAGIC_BYTES = { 0x0, 'P', 'E', 'G', 0x0, 0xA };
+	public static final byte[] MAGIC_BYTES = {0x0, 'P', 'E', 'G', 0x0, 0xA};
 	
 	private final PEGrammar             grammar;
 	private final ByteArrayOutputStream baos;
 	
-	private byte[]                      bytes;
+	private byte[] bytes;
 	
 	public PEGrammarSerializer(final PEGrammar grammar) {
 		this.grammar = grammar;
@@ -65,16 +65,18 @@ public final class PEGrammarSerializer {
 				final char[] chars = ((LiteralCharClass) exp).getChars();
 				
 				writeInt(chars.length);
-				for(final char c : chars)
+				for(final char c : chars) {
 					writeChar(c);
+				}
 				
 				break;
 			case CHOICE:
 				final Expression[] sub = ((Choice) exp).getSubExpressions();
 				
 				writeInt(sub.length);
-				for(final Expression e : sub)
+				for(final Expression e : sub) {
 					serializeExpression(e);
+				}
 				
 				break;
 			case NON_TERMINAL:
@@ -101,8 +103,9 @@ public final class PEGrammarSerializer {
 				final Expression[] sub1 = ((Sequence) exp).getSubExpressions();
 				
 				writeInt(sub1.length);
-				for(final Expression e : sub1)
+				for(final Expression e : sub1) {
 					serializeExpression(e);
+				}
 				
 				break;
 			case STRING:
@@ -127,12 +130,16 @@ public final class PEGrammarSerializer {
 	}
 	
 	public PEGrammarSerializer write(final OutputStream out, final boolean closeStream) throws IOException {
-		if(bytes == null) serialize();
+		if(bytes == null) {
+			serialize();
+		}
 		
 		out.write(bytes);
 		out.flush();
 		
-		if(closeStream) out.close();
+		if(closeStream) {
+			out.close();
+		}
 		
 		return this;
 	}

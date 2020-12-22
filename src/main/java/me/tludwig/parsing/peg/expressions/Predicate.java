@@ -48,7 +48,9 @@ public final class Predicate extends Expression {
 	public String toString() {
 		String s = expression.toString();
 		
-		if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
+		if(expression instanceof Choice || expression instanceof Sequence) {
+			s = "(" + s + ")";
+		}
 		
 		if(type == PredicateType.AND) return '&' + s;
 		else if(type == PredicateType.NOT) return '!' + s;

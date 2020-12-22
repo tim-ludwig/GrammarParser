@@ -34,7 +34,9 @@ public final class Choice extends Expression {
 			parseTree = sExp.parseTree(input, position);
 			
 			if(sExp instanceof Predicate) {
-				if(!((Predicate) sExp).success(parseTree)) continue;
+				if(!((Predicate) sExp).success(parseTree)) {
+					continue;
+				}
 				
 				return new ParseTree(this, position, "");
 			}
@@ -55,7 +57,9 @@ public final class Choice extends Expression {
 		return Arrays.stream(subExpressions).map(expression -> {
 			String s = expression.toString();
 			
-			if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
+			if(expression instanceof Choice || expression instanceof Sequence) {
+				s = "(" + s + ")";
+			}
 			
 			return s;
 		}).collect(Collectors.joining(" / "));

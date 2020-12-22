@@ -29,8 +29,11 @@ public final class LiteralCharClass extends Primary {
 		while(m.find()) {
 			group = m.group();
 			
-			if(group.length() == 1) classes.add(LiteralCharClass.of(group.charAt(0)));
-			else classes.add(LiteralCharClass.range(group.charAt(0), group.charAt(2)));
+			if(group.length() == 1) {
+				classes.add(LiteralCharClass.of(group.charAt(0)));
+			} else {
+				classes.add(LiteralCharClass.range(group.charAt(0), group.charAt(2)));
+			}
 		}
 		
 		return LiteralCharClass.union(classes.toArray(new LiteralCharClass[classes.size()]));
@@ -58,8 +61,9 @@ public final class LiteralCharClass extends Primary {
 	public static LiteralCharClass range(final char from, final char to) {
 		final char[] chars = new char[to - from + 1];
 		
-		for(int i = 0; i < chars.length; i++)
+		for(int i = 0; i < chars.length; i++) {
 			chars[i] = (char) (from + i);
+		}
 		
 		return new LiteralCharClass(chars);
 	}
@@ -71,14 +75,18 @@ public final class LiteralCharClass extends Primary {
 	public static LiteralCharClass union(final LiteralCharClass... classes) {
 		final List<Character> chars = new LinkedList<>();
 		
-		for(final LiteralCharClass clazz : classes)
+		for(final LiteralCharClass clazz : classes) {
 			for(final char c : clazz.chars)
-				if(!chars.contains(c)) chars.add(c);
-			
+				if(!chars.contains(c)) {
+					chars.add(c);
+				}
+		}
+		
 		final char[] cArray = new char[chars.size()];
 		
-		for(int i = 0; i < cArray.length; i++)
+		for(int i = 0; i < cArray.length; i++) {
 			cArray[i] = chars.get(i);
+		}
 		
 		return new LiteralCharClass(cArray);
 	}
