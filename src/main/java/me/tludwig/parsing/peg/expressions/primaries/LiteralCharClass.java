@@ -1,7 +1,8 @@
 package me.tludwig.parsing.peg.expressions.primaries;
 
+import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.function.IntPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,14 +10,29 @@ import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public final class LiteralCharClass extends Primary {
-	private final char[] chars;
+	private static final IntPredicate UNION_IDENTITY = c -> false, INTERSECTION_IDENTITY = c -> true;
 	
-	private LiteralCharClass(final char... chars) {
-		this.chars = chars;
+	private final IntPredicate predicate;
+	
+	private LiteralCharClass(final IntPredicate predicate) {
+		this.predicate = predicate;
+	}
+	
+	public LiteralCharClass invert() {
+		return new LiteralCharClass(predicate.negate());
+	}
+	
+	public static LiteralCharClass of(final IntPredicate charPredicate) {
+		return new LiteralCharClass(charPredicate);
 	}
 	
 	public static LiteralCharClass of(final char... chars) {
-		return new LiteralCharClass(chars);
+		return new LiteralCharClass(toTest -> {
+			for(final char c : chars)
+				if(toTest == c) return true;
+			
+			return false;
+		});
 	}
 	
 	public static LiteralCharClass of(final String def) {
@@ -29,26 +45,24 @@ public final class LiteralCharClass extends Primary {
 		while(m.find()) {
 			group = m.group();
 			
-			if(group.length() == 1) {
-				classes.add(LiteralCharClass.of(group.charAt(0)));
-			} else {
-				classes.add(LiteralCharClass.range(group.charAt(0), group.charAt(2)));
-			}
+			if(group.length() == 1) classes.add(LiteralCharClass.of(group.charAt(0)));
+			else classes.add(LiteralCharClass.range(group.charAt(0), group.charAt(2)));
 		}
 		
 		return LiteralCharClass.union(classes.toArray(new LiteralCharClass[classes.size()]));
 	}
 	
-	public char[] getChars() {
-		return chars;
+	public IntPredicate getPredicate() {
+		return predicate;
 	}
 	
 	@Override
 	public ParseTree parseTree(final String input, final int position) {
 		if(position >= input.length()) return null;
 		
-		for(final char c : chars)
-			if(input.charAt(position) == c) return new ParseTree(this, position, String.valueOf(c));
+		final int c = input.codePointAt(position);
+		
+		if(predicate.test(c)) return new ParseTree(this, position, String.copyValueOf(Character.toChars(c)));
 		
 		return null;
 	}
@@ -59,36 +73,19 @@ public final class LiteralCharClass extends Primary {
 	}
 	
 	public static LiteralCharClass range(final char from, final char to) {
-		final char[] chars = new char[to - from + 1];
-		
-		for(int i = 0; i < chars.length; i++) {
-			chars[i] = (char) (from + i);
-		}
-		
-		return new LiteralCharClass(chars);
+		return range((int) from, (int) to);
 	}
 	
 	public static LiteralCharClass range(final int from, final int to) {
-		return range((char) from, (char) to);
+		return new LiteralCharClass(c -> from <= c && c <= to);
 	}
 	
 	public static LiteralCharClass union(final LiteralCharClass... classes) {
-		final List<Character> chars = new LinkedList<>();
-		
-		for(final LiteralCharClass clazz : classes) {
-			for(final char c : clazz.chars)
-				if(!chars.contains(c)) {
-					chars.add(c);
-				}
-		}
-		
-		final char[] cArray = new char[chars.size()];
-		
-		for(int i = 0; i < cArray.length; i++) {
-			cArray[i] = chars.get(i);
-		}
-		
-		return new LiteralCharClass(cArray);
+		return new LiteralCharClass(Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(UNION_IDENTITY, IntPredicate::or));
+	}
+	
+	public static LiteralCharClass intersection(final LiteralCharClass... classes) {
+		return new LiteralCharClass(Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(INTERSECTION_IDENTITY, IntPredicate::and));
 	}
 	
 	public static LiteralCharClass digits() {
@@ -97,6 +94,10 @@ public final class LiteralCharClass extends Primary {
 	
 	public static LiteralCharClass hexDigits() {
 		return union(digits(), range('a', 'f'), range('A', 'F'));
+	}
+	
+	public static LiteralCharClass octalDigits() {
+		return range('0', '7');
 	}
 	
 	public static LiteralCharClass lower() {

@@ -22,6 +22,8 @@ public class NonTerminal extends Expression {
 	}
 	
 	public Expression getDefinition() {
+		if(!grammar.getDefinitions().containsKey(name)) throw new IllegalStateException("Rule '" + name + "' is not defined!");
+		
 		return grammar.getDefinitions().get(name);
 	}
 	

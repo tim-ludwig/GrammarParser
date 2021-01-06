@@ -48,9 +48,7 @@ public final class Predicate extends Expression {
 	public String toString() {
 		String s = expression.toString();
 		
-		if(expression instanceof Choice || expression instanceof Sequence) {
-			s = "(" + s + ")";
-		}
+		if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
 		
 		if(type == PredicateType.AND) return '&' + s;
 		else if(type == PredicateType.NOT) return '!' + s;
@@ -63,14 +61,8 @@ public final class Predicate extends Expression {
 	}
 	
 	public enum PredicateType {
-		AND(0),
-		NOT(1);
-		
-		private final byte id;
-		
-		private PredicateType(final int id) {
-			this.id = (byte) id;
-		}
+		AND,
+		NOT;
 		
 		public boolean success(final ParseTree parseTree) {
 			switch(this) {
@@ -84,11 +76,11 @@ public final class Predicate extends Expression {
 		}
 		
 		public byte getId() {
-			return id;
+			return (byte) ordinal();
 		}
 		
 		public static PredicateType getById(final int id) {
-			return id == 0 ? AND : id == 1 ? NOT : null;
+			return values()[id];
 		}
 	}
 }

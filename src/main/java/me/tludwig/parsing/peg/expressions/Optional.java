@@ -38,9 +38,7 @@ public final class Optional extends Expression {
 	public String toString() {
 		String s = expression.toString();
 		
-		if(expression instanceof Choice || expression instanceof Sequence) {
-			s = "(" + s + ")";
-		}
+		if(expression instanceof Choice || expression instanceof Sequence) s = "(" + s + ")";
 		
 		return s + "?";
 	}

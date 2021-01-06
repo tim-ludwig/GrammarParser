@@ -3,6 +3,7 @@ package me.tludwig.parsing.peg;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
 import me.tludwig.parsing.peg.ast.ASTRule;
@@ -42,16 +43,14 @@ public abstract class PEGrammar {
 		return startSymbol.parseTree(input, 0);
 	}
 	
-	protected final NonTerminal def(final String name, final ASTRule rule, final Expression expression) {
+	protected final void def(final String name, final ASTRule rule, final Expression expression) {
 		astConversionRules.put(name, rule);
 		
-		return def(name, expression);
+		def(name, expression);
 	}
 	
-	protected final NonTerminal def(final String name, final Expression expression) {
-		definitions.put(name, expression);
-		
-		return def(name);
+	protected final void def(final String name, final Expression expression) {
+		definitions.put(name, expression == null ? NullExpression.INSTANCE : expression);
 	}
 	
 	protected final NonTerminal def(final String name) {
@@ -86,20 +85,40 @@ public abstract class PEGrammar {
 		return Repetition.zeroOrMore(expression);
 	}
 	
+	protected final Repetition zeroOrMore(final Expression... expressions) {
+		return zeroOrMore(seq(expressions));
+	}
+	
 	protected final Repetition oneOrMore(final Expression expression) {
 		return Repetition.oneOrMore(expression);
+	}
+	
+	protected final Repetition oneOrMore(final Expression... expressions) {
+		return oneOrMore(seq(expressions));
 	}
 	
 	protected final Optional opt(final Expression expression) {
 		return Optional.of(expression);
 	}
 	
+	protected final Optional opt(final Expression... expressions) {
+		return opt(seq(expressions));
+	}
+	
 	protected final Predicate and(final Expression expression) {
 		return Predicate.and(expression);
 	}
 	
+	protected final Predicate and(final Expression... expressions) {
+		return and(seq(expressions));
+	}
+	
 	protected final Predicate not(final Expression expression) {
 		return Predicate.not(expression);
+	}
+	
+	protected final Predicate not(final Expression... expressions) {
+		return not(seq(expressions));
 	}
 	
 	protected final LiteralChar character(final char c) {
@@ -116,6 +135,10 @@ public abstract class PEGrammar {
 	
 	protected final LiteralString CRLF() {
 		return string("\r\n");
+	}
+	
+	protected final LiteralCharClass list(final IntPredicate charPredicate) {
+		return LiteralCharClass.of(charPredicate);
 	}
 	
 	protected final LiteralCharClass list(final char... chars) {
@@ -146,6 +169,13 @@ public abstract class PEGrammar {
 	 */
 	protected final LiteralCharClass hexdigits() {
 		return LiteralCharClass.hexDigits();
+	}
+	
+	/**
+	 * [0-7]
+	 */
+	protected final LiteralCharClass octaldigits() {
+		return LiteralCharClass.octalDigits();
 	}
 	
 	/**
@@ -263,13 +293,26 @@ public abstract class PEGrammar {
 		
 		builder.append(buildRule(startSymbol));
 		builder.append("\n");
-		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol))
-				.map(this::buildRule).collect(Collectors.joining("\n")));
+		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol)).map(this::buildRule).collect(Collectors.joining("\n")));
 		
 		return builder.toString();
 	}
 	
 	private String buildRule(final NonTerminal nonTerminal) {
 		return nonTerminal + " <- " + nonTerminal.getDefinition();
+	}
+	
+	private static class NullExpression extends Expression {
+		private static final NullExpression INSTANCE = new NullExpression();
+		
+		@Override
+		public ParseTree parseTree(final String input, final int position) {
+			return null;
+		}
+		
+		@Override
+		public ExpressionType type() {
+			return null;
+		}
 	}
 }
