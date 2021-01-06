@@ -2,7 +2,7 @@ package me.tludwig.parsing.peg.expressions.primaries;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.function.Predicate;
+import java.util.function.IntPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,11 +10,11 @@ import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public final class LiteralCharClass extends Primary {
-	private static final Predicate<Character> UNION_IDENTITY = c -> false, INTERSECTION_IDENTITY = c -> true;
+	private static final IntPredicate UNION_IDENTITY = c -> false, INTERSECTION_IDENTITY = c -> true;
 	
-	private final Predicate<Character> predicate;
+	private final IntPredicate predicate;
 	
-	private LiteralCharClass(final Predicate<Character> predicate) {
+	private LiteralCharClass(final IntPredicate predicate) {
 		this.predicate = predicate;
 	}
 	
@@ -22,14 +22,22 @@ public final class LiteralCharClass extends Primary {
 		return new LiteralCharClass(predicate.negate());
 	}
 	
-	public static LiteralCharClass of(final Predicate<Character> charPredicate) {
+	public static LiteralCharClass of(final IntPredicate charPredicate) {
 		return new LiteralCharClass(charPredicate);
 	}
 	
-	public static LiteralCharClass of(final Character... chars) {
+	public static LiteralCharClass of(final char... chars) {
 		Arrays.sort(chars);
 		
-		return new LiteralCharClass(toTest -> (Arrays.binarySearch(chars, toTest) >= 0));
+		return new LiteralCharClass(toTest -> Arrays.binarySearch(chars, (char) toTest) >= 0);
+	}
+	
+	public static LiteralCharClass of(final char c) {
+		return new LiteralCharClass(toTest -> toTest == c);
+	}
+	
+	public static LiteralCharClass of(final int c) {
+		return of((char) c);
 	}
 	
 	public static LiteralCharClass of(final String def) {
@@ -49,7 +57,7 @@ public final class LiteralCharClass extends Primary {
 		return LiteralCharClass.union(classes.toArray(new LiteralCharClass[classes.size()]));
 	}
 	
-	public Predicate<Character> getPredicate() {
+	public IntPredicate getPredicate() {
 		return predicate;
 	}
 	
@@ -79,12 +87,12 @@ public final class LiteralCharClass extends Primary {
 	
 	public static LiteralCharClass union(final LiteralCharClass... classes) {
 		return new LiteralCharClass(
-				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(UNION_IDENTITY, Predicate::or));
+				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(UNION_IDENTITY, IntPredicate::or));
 	}
 	
 	public static LiteralCharClass intersection(final LiteralCharClass... classes) {
 		return new LiteralCharClass(
-				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(INTERSECTION_IDENTITY, Predicate::and));
+				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(INTERSECTION_IDENTITY, IntPredicate::and));
 	}
 	
 	public static LiteralCharClass digits() {
@@ -124,7 +132,7 @@ public final class LiteralCharClass extends Primary {
 	}
 	
 	public static LiteralCharClass control() {
-		return union(range(0, 0x1F), of((char) 0x7F));
+		return union(range(0, 0x1F), of(0x7F));
 	}
 	
 	public static LiteralCharClass whitespace() {

@@ -3,6 +3,7 @@ package me.tludwig.parsing.peg;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
 import me.tludwig.parsing.peg.ast.ASTRule;
@@ -136,11 +137,11 @@ public abstract class PEGrammar {
 		return string("\r\n");
 	}
 	
-	protected final LiteralCharClass list(final java.util.function.Predicate<Character> charPredicate) {
+	protected final LiteralCharClass list(final IntPredicate charPredicate) {
 		return LiteralCharClass.of(charPredicate);
 	}
 	
-	protected final LiteralCharClass list(final Character... chars) {
+	protected final LiteralCharClass list(final char... chars) {
 		return LiteralCharClass.of(chars);
 	}
 	

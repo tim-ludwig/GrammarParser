@@ -61,7 +61,7 @@ public class PEGrammarDeserializer {
 						case CHAR:
 							return character(readChar());
 						case CHAR_CLASS:
-							final Character[] chars = new Character[readInt()];
+							final char[] chars = new char[readInt()];
 							
 							for(int i = 0; i < chars.length; i++)
 								chars[i] = readChar();
