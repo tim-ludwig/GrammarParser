@@ -25,9 +25,7 @@ public class PEGrammarDeserializer {
 	public PEGrammarDeserializer(final InputStream in, final boolean closeStream) throws IOException {
 		bais = new ByteArrayInputStream(in.readAllBytes());
 		
-		if(closeStream) {
-			in.close();
-		}
+		if(closeStream) in.close();
 	}
 	
 	public PEGrammarDeserializer(final InputStream in) throws IOException {
@@ -50,9 +48,8 @@ public class PEGrammarDeserializer {
 				@Override
 				protected void init() {
 					final int defCount = readInt();
-					for(int i = 0; i < defCount; i++) {
+					for(int i = 0; i < defCount; i++)
 						def(readString(), deserializeExpression());
-					}
 				}
 				
 				private Expression deserializeExpression() {
@@ -64,19 +61,17 @@ public class PEGrammarDeserializer {
 						case CHAR:
 							return character(readChar());
 						case CHAR_CLASS:
-							final char[] chars = new char[readInt()];
+							final Character[] chars = new Character[readInt()];
 							
-							for(int i = 0; i < chars.length; i++) {
+							for(int i = 0; i < chars.length; i++)
 								chars[i] = readChar();
-							}
 							
 							return list(chars);
 						case CHOICE:
 							final Expression[] sub = new Expression[readInt()];
 							
-							for(int i = 0; i < sub.length; i++) {
+							for(int i = 0; i < sub.length; i++)
 								sub[i] = deserializeExpression();
-							}
 							
 							return choice(sub);
 						case EOF:
@@ -94,9 +89,8 @@ public class PEGrammarDeserializer {
 						case SEQUENCE:
 							final Expression[] sub2 = new Expression[readInt()];
 							
-							for(int i = 0; i < sub2.length; i++) {
+							for(int i = 0; i < sub2.length; i++)
 								sub2[i] = deserializeExpression();
-							}
 							
 							return seq(sub2);
 						case STRING:
@@ -114,9 +108,7 @@ public class PEGrammarDeserializer {
 	}
 	
 	public PEGrammar getGrammar() {
-		if(grammar == null) {
-			deserialize();
-		}
+		if(grammar == null) deserialize();
 		
 		return grammar;
 	}

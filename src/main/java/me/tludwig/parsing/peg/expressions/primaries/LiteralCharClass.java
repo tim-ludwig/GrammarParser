@@ -2,7 +2,7 @@ package me.tludwig.parsing.peg.expressions.primaries;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,11 +10,11 @@ import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public final class LiteralCharClass extends Primary {
-	private static final IntPredicate UNION_IDENTITY = c -> false, INTERSECTION_IDENTITY = c -> true;
+	private static final Predicate<Character> UNION_IDENTITY = c -> false, INTERSECTION_IDENTITY = c -> true;
 	
-	private final IntPredicate predicate;
+	private final Predicate<Character> predicate;
 	
-	private LiteralCharClass(final IntPredicate predicate) {
+	private LiteralCharClass(final Predicate<Character> predicate) {
 		this.predicate = predicate;
 	}
 	
@@ -22,14 +22,14 @@ public final class LiteralCharClass extends Primary {
 		return new LiteralCharClass(predicate.negate());
 	}
 	
-	public static LiteralCharClass of(final IntPredicate charPredicate) {
+	public static LiteralCharClass of(final Predicate<Character> charPredicate) {
 		return new LiteralCharClass(charPredicate);
 	}
 	
-	public static LiteralCharClass of(final int... chars) {
-		Arrays.sort(chars);
+	public static LiteralCharClass of(final Character... chars) {
+		Arrays.sort(chars, Character::compare);
 		
-		return new LiteralCharClass(toTest -> (Arrays.binarySearch(chars, toTest) >= 0));
+		return new LiteralCharClass(toTest -> (Arrays.binarySearch(chars, toTest, Character::compareTo) >= 0));
 	}
 	
 	public static LiteralCharClass of(final String def) {
@@ -49,7 +49,7 @@ public final class LiteralCharClass extends Primary {
 		return LiteralCharClass.union(classes.toArray(new LiteralCharClass[classes.size()]));
 	}
 	
-	public IntPredicate getPredicate() {
+	public Predicate<Character> getPredicate() {
 		return predicate;
 	}
 	
@@ -57,7 +57,7 @@ public final class LiteralCharClass extends Primary {
 	public ParseTree parseTree(final String input, final int position) {
 		if(position >= input.length()) return null;
 		
-		final int c = input.codePointAt(position);
+		final char c = input.charAt(position);
 		
 		if(predicate.test(c)) return new ParseTree(this, position, String.copyValueOf(Character.toChars(c)));
 		
@@ -79,12 +79,12 @@ public final class LiteralCharClass extends Primary {
 	
 	public static LiteralCharClass union(final LiteralCharClass... classes) {
 		return new LiteralCharClass(
-				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(UNION_IDENTITY, IntPredicate::or));
+				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(UNION_IDENTITY, Predicate::or));
 	}
 	
 	public static LiteralCharClass intersection(final LiteralCharClass... classes) {
 		return new LiteralCharClass(
-				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(INTERSECTION_IDENTITY, IntPredicate::and));
+				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(INTERSECTION_IDENTITY, Predicate::and));
 	}
 	
 	public static LiteralCharClass digits() {

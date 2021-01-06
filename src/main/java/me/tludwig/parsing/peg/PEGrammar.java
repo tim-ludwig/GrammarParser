@@ -3,7 +3,6 @@ package me.tludwig.parsing.peg;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
 import me.tludwig.parsing.peg.ast.ASTRule;
@@ -137,11 +136,11 @@ public abstract class PEGrammar {
 		return string("\r\n");
 	}
 	
-	protected final LiteralCharClass list(final IntPredicate charPredicate) {
+	protected final LiteralCharClass list(final java.util.function.Predicate<Character> charPredicate) {
 		return LiteralCharClass.of(charPredicate);
 	}
 	
-	protected final LiteralCharClass list(final char... chars) {
+	protected final LiteralCharClass list(final Character... chars) {
 		return LiteralCharClass.of(chars);
 	}
 	
@@ -293,7 +292,8 @@ public abstract class PEGrammar {
 		
 		builder.append(buildRule(startSymbol));
 		builder.append("\n");
-		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol)).map(this::buildRule).collect(Collectors.joining("\n")));
+		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol))
+				.map(this::buildRule).collect(Collectors.joining("\n")));
 		
 		return builder.toString();
 	}
