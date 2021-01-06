@@ -27,9 +27,9 @@ public final class LiteralCharClass extends Primary {
 	}
 	
 	public static LiteralCharClass of(final Character... chars) {
-		Arrays.sort(chars, Character::compare);
+		Arrays.sort(chars);
 		
-		return new LiteralCharClass(toTest -> (Arrays.binarySearch(chars, toTest, Character::compareTo) >= 0));
+		return new LiteralCharClass(toTest -> (Arrays.binarySearch(chars, toTest) >= 0));
 	}
 	
 	public static LiteralCharClass of(final String def) {
