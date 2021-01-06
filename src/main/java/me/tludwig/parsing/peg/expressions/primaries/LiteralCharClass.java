@@ -26,13 +26,10 @@ public final class LiteralCharClass extends Primary {
 		return new LiteralCharClass(charPredicate);
 	}
 	
-	public static LiteralCharClass of(final char... chars) {
-		return new LiteralCharClass(toTest -> {
-			for(final char c : chars)
-				if(toTest == c) return true;
-			
-			return false;
-		});
+	public static LiteralCharClass of(final int... chars) {
+		Arrays.sort(chars);
+		
+		return new LiteralCharClass(toTest -> (Arrays.binarySearch(chars, toTest) >= 0));
 	}
 	
 	public static LiteralCharClass of(final String def) {
@@ -81,11 +78,13 @@ public final class LiteralCharClass extends Primary {
 	}
 	
 	public static LiteralCharClass union(final LiteralCharClass... classes) {
-		return new LiteralCharClass(Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(UNION_IDENTITY, IntPredicate::or));
+		return new LiteralCharClass(
+				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(UNION_IDENTITY, IntPredicate::or));
 	}
 	
 	public static LiteralCharClass intersection(final LiteralCharClass... classes) {
-		return new LiteralCharClass(Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(INTERSECTION_IDENTITY, IntPredicate::and));
+		return new LiteralCharClass(
+				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(INTERSECTION_IDENTITY, IntPredicate::and));
 	}
 	
 	public static LiteralCharClass digits() {
