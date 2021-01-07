@@ -4,9 +4,9 @@ import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public class LiteralChar extends Primary {
-	private final char c;
+	private final int c;
 	
-	private LiteralChar(final char c) {
+	private LiteralChar(final int c) {
 		this.c = c;
 	}
 	
@@ -15,10 +15,10 @@ public class LiteralChar extends Primary {
 	}
 	
 	public static LiteralChar of(final int c) {
-		return new LiteralChar((char) c);
+		return new LiteralChar(c);
 	}
 	
-	public char getChar() {
+	public int getChar() {
 		return c;
 	}
 	
@@ -26,7 +26,7 @@ public class LiteralChar extends Primary {
 	public ParseTree parseTree(final String input, final int position) {
 		if(position >= input.length()) return null;
 		
-		if(input.charAt(position) == c) return new ParseTree(this, position, String.valueOf(c));
+		if(input.codePointAt(position) == c) return new ParseTree(this, position, String.valueOf(Character.toChars(c)));
 		
 		return null;
 	}

@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import me.tludwig.parsing.peg.CharClassPredicate;
 import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.PEGrammar;
 import me.tludwig.parsing.peg.expressions.Choice;
@@ -22,7 +23,7 @@ import me.tludwig.parsing.peg.expressions.primaries.LiteralCharClass;
 import me.tludwig.parsing.peg.expressions.primaries.LiteralString;
 
 public final class PEGrammarSerializer {
-	public static final byte[] MAGIC_BYTES = {0x0, 'P', 'E', 'G', 0x0, 0xA};
+	public static final byte[] MAGIC_BYTES = { 0x0, 'P', 'E', 'G', 0x0, 0xA };
 	
 	private final PEGrammar             grammar;
 	private final ByteArrayOutputStream baos;
@@ -59,24 +60,22 @@ public final class PEGrammarSerializer {
 		
 		switch(type) {
 			case CHAR:
-				writeChar(((LiteralChar) exp).getChar());
+				writeInt(((LiteralChar) exp).getChar());
 				break;
 			case CHAR_CLASS:
-				final char[] chars = ((LiteralCharClass) exp).getChars();
+				final int[] data = CharClassPredicate.getData(((LiteralCharClass) exp).getPredicate());
 				
-				writeInt(chars.length);
-				for(final char c : chars) {
-					writeChar(c);
-				}
+				writeInt(data.length);
+				for(final int d : data)
+					writeInt(d);
 				
 				break;
 			case CHOICE:
 				final Expression[] sub = ((Choice) exp).getSubExpressions();
 				
 				writeInt(sub.length);
-				for(final Expression e : sub) {
+				for(final Expression e : sub)
 					serializeExpression(e);
-				}
 				
 				break;
 			case NON_TERMINAL:
@@ -103,9 +102,8 @@ public final class PEGrammarSerializer {
 				final Expression[] sub1 = ((Sequence) exp).getSubExpressions();
 				
 				writeInt(sub1.length);
-				for(final Expression e : sub1) {
+				for(final Expression e : sub1)
 					serializeExpression(e);
-				}
 				
 				break;
 			case STRING:
@@ -130,16 +128,12 @@ public final class PEGrammarSerializer {
 	}
 	
 	public PEGrammarSerializer write(final OutputStream out, final boolean closeStream) throws IOException {
-		if(bytes == null) {
-			serialize();
-		}
+		if(bytes == null) serialize();
 		
 		out.write(bytes);
 		out.flush();
 		
-		if(closeStream) {
-			out.close();
-		}
+		if(closeStream) out.close();
 		
 		return this;
 	}
@@ -161,11 +155,6 @@ public final class PEGrammarSerializer {
 		write((byte) (i >>> 16));
 		write((byte) (i >>> 8));
 		write((byte) i);
-	}
-	
-	private void writeChar(final char c) {
-		write((byte) (c >>> 8));
-		write((byte) c);
 	}
 	
 	private void writeString(final String s) {

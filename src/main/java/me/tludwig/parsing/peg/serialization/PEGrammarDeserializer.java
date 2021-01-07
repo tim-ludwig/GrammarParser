@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import me.tludwig.parsing.peg.CharClassPredicate;
 import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.PEGrammar;
 import me.tludwig.parsing.peg.expressions.Expression;
@@ -59,14 +60,15 @@ public class PEGrammarDeserializer {
 						case ANY_CHAR:
 							return any();
 						case CHAR:
-							return character(readChar());
+							return character(readInt());
 						case CHAR_CLASS:
-							final char[] chars = new char[readInt()];
+							// FIXME
+							final int[] data = new int[readInt()];
 							
-							for(int i = 0; i < chars.length; i++)
-								chars[i] = readChar();
+							for(int i = 0; i < data.length; i++)
+								data[i] = readInt();
 							
-							return list(chars);
+							return CharClassPredicate.fromData(data);
 						case CHOICE:
 							final Expression[] sub = new Expression[readInt()];
 							
@@ -81,10 +83,10 @@ public class PEGrammarDeserializer {
 						case OPTIONAL:
 							return opt(deserializeExpression());
 						case PREDICATE:
-							byte predicateType = read();
+							final byte predicateType = read();
 							return Predicate.of(deserializeExpression(), PredicateType.getById(predicateType));
 						case REPETITION:
-							int min = readInt(), max = readInt();
+							final int min = readInt(), max = readInt();
 							return between(deserializeExpression(), min, max);
 						case SEQUENCE:
 							final Expression[] sub2 = new Expression[readInt()];
@@ -100,7 +102,7 @@ public class PEGrammarDeserializer {
 					return null;
 				}
 			};
-		} catch(final Exception e) {
+		}catch(final Exception e) {
 			grammar = null;
 		}
 		
@@ -127,10 +129,6 @@ public class PEGrammarDeserializer {
 	
 	private int readInt() {
 		return (read() & 0xFF) << 24 | (read() & 0xFF) << 16 | (read() & 0xFF) << 8 | read() & 0xFF;
-	}
-	
-	private char readChar() {
-		return (char) ((read() & 0xFF) << 8 | read() & 0xFF);
 	}
 	
 	private String readString() {
