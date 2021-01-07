@@ -1,11 +1,12 @@
 package me.tludwig.parsing.peg;
 
+import java.lang.Character.UnicodeBlock;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 
+import me.tludwig.parsing.UnicodeGeneralCategory;
 import me.tludwig.parsing.peg.ast.ASTRule;
 import me.tludwig.parsing.peg.ast.AbstractSyntaxTree;
 import me.tludwig.parsing.peg.expressions.Choice;
@@ -137,16 +138,28 @@ public abstract class PEGrammar {
 		return string("\r\n");
 	}
 	
-	protected final LiteralCharClass list(final IntPredicate charPredicate) {
-		return LiteralCharClass.of(charPredicate);
+	protected final LiteralCharClass list(final char... chars) {
+		return LiteralCharClass.of(chars);
 	}
 	
-	protected final LiteralCharClass list(final char... chars) {
+	protected final LiteralCharClass list(final int... chars) {
 		return LiteralCharClass.of(chars);
 	}
 	
 	protected final LiteralCharClass list(final String def) {
 		return LiteralCharClass.of(def);
+	}
+	
+	protected final LiteralCharClass list(final UnicodeGeneralCategory unicodeCategory) {
+		return LiteralCharClass.of(unicodeCategory);
+	}
+	
+	protected final LiteralCharClass list(final UnicodeGeneralCategory... unicodeCategories) {
+		return LiteralCharClass.of(unicodeCategories);
+	}
+	
+	protected final LiteralCharClass list(final UnicodeBlock unicodeBlock) {
+		return LiteralCharClass.of(unicodeBlock);
 	}
 	
 	protected final LiteralCharClass range(final char from, final char to) {
@@ -293,8 +306,7 @@ public abstract class PEGrammar {
 		
 		builder.append(buildRule(startSymbol));
 		builder.append("\n");
-		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol))
-				.map(this::buildRule).collect(Collectors.joining("\n")));
+		builder.append(nonTerminals.values().stream().filter(nonTerminal -> !nonTerminal.equals(startSymbol)).map(this::buildRule).collect(Collectors.joining("\n")));
 		
 		return builder.toString();
 	}

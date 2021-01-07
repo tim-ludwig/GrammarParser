@@ -1,16 +1,19 @@
 package me.tludwig.parsing.peg.expressions.primaries;
 
+import java.lang.Character.UnicodeBlock;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.function.IntPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.tludwig.parsing.UnicodeGeneralCategory;
 import me.tludwig.parsing.peg.ExpressionType;
 import me.tludwig.parsing.peg.ParseTree;
 
 public final class LiteralCharClass extends Primary {
-	private static final IntPredicate UNION_IDENTITY = c -> false, INTERSECTION_IDENTITY = c -> true;
+	private static final IntPredicate     UNION_IDENTITY = c -> false, INTERSECTION_IDENTITY = c -> true;
+	private static final LiteralCharClass UNION_INSTANCE = new LiteralCharClass(UNION_IDENTITY), INTERSECTION_INSTANCE = new LiteralCharClass(INTERSECTION_IDENTITY);
 	
 	private final IntPredicate predicate;
 	
@@ -22,8 +25,12 @@ public final class LiteralCharClass extends Primary {
 		return new LiteralCharClass(predicate.negate());
 	}
 	
-	public static LiteralCharClass of(final IntPredicate charPredicate) {
-		return new LiteralCharClass(charPredicate);
+	public LiteralCharClass unite(final LiteralCharClass... classes) {
+		return new LiteralCharClass(Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(predicate, IntPredicate::or));
+	}
+	
+	public LiteralCharClass intersect(final LiteralCharClass... classes) {
+		return new LiteralCharClass(Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(predicate, IntPredicate::and));
 	}
 	
 	public static LiteralCharClass of(final char... chars) {
@@ -32,12 +39,18 @@ public final class LiteralCharClass extends Primary {
 		return new LiteralCharClass(toTest -> Arrays.binarySearch(chars, (char) toTest) >= 0);
 	}
 	
+	public static LiteralCharClass of(final int... chars) {
+		Arrays.sort(chars);
+		
+		return new LiteralCharClass(toTest -> Arrays.binarySearch(chars, toTest) >= 0);
+	}
+	
 	public static LiteralCharClass of(final char c) {
-		return new LiteralCharClass(toTest -> toTest == c);
+		return of((int) c);
 	}
 	
 	public static LiteralCharClass of(final int c) {
-		return of((char) c);
+		return new LiteralCharClass(toTest -> toTest == c);
 	}
 	
 	public static LiteralCharClass of(final String def) {
@@ -57,6 +70,20 @@ public final class LiteralCharClass extends Primary {
 		return LiteralCharClass.union(classes.toArray(new LiteralCharClass[classes.size()]));
 	}
 	
+	public static LiteralCharClass of(final UnicodeGeneralCategory unicodeCategory) {
+		return new LiteralCharClass(toTest -> UnicodeGeneralCategory.of(toTest) == unicodeCategory);
+	}
+	
+	public static LiteralCharClass of(final UnicodeGeneralCategory... unicodeCategories) {
+		Arrays.sort(unicodeCategories);
+		
+		return new LiteralCharClass(toTest -> Arrays.binarySearch(unicodeCategories, UnicodeGeneralCategory.of(toTest)) >= 0);
+	}
+	
+	public static LiteralCharClass of(final UnicodeBlock unicodeBlock) {
+		return new LiteralCharClass(toTest -> UnicodeBlock.of(toTest).equals(unicodeBlock));
+	}
+	
 	public IntPredicate getPredicate() {
 		return predicate;
 	}
@@ -65,7 +92,7 @@ public final class LiteralCharClass extends Primary {
 	public ParseTree parseTree(final String input, final int position) {
 		if(position >= input.length()) return null;
 		
-		final char c = input.charAt(position);
+		final int c = input.codePointAt(position);
 		
 		if(predicate.test(c)) return new ParseTree(this, position, String.copyValueOf(Character.toChars(c)));
 		
@@ -86,13 +113,11 @@ public final class LiteralCharClass extends Primary {
 	}
 	
 	public static LiteralCharClass union(final LiteralCharClass... classes) {
-		return new LiteralCharClass(
-				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(UNION_IDENTITY, IntPredicate::or));
+		return UNION_INSTANCE.unite(classes);
 	}
 	
 	public static LiteralCharClass intersection(final LiteralCharClass... classes) {
-		return new LiteralCharClass(
-				Arrays.stream(classes).map(clazz -> clazz.predicate).reduce(INTERSECTION_IDENTITY, IntPredicate::and));
+		return INTERSECTION_INSTANCE.intersect(classes);
 	}
 	
 	public static LiteralCharClass digits() {
