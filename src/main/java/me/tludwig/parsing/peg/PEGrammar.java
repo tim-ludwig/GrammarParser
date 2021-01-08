@@ -52,6 +52,8 @@ public abstract class PEGrammar {
 	
 	protected final void def(final String name, final Expression expression) {
 		definitions.put(name, expression == null ? NullExpression.INSTANCE : expression);
+		
+		def(name);
 	}
 	
 	protected final NonTerminal def(final String name) {

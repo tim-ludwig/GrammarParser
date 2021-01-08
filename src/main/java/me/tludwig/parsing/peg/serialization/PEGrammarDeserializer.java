@@ -47,6 +47,7 @@ public class PEGrammarDeserializer {
 		
 		try {
 			grammar = new PEGrammar(readString()) {
+				
 				@Override
 				protected void init() {
 					final int defCount = readInt();

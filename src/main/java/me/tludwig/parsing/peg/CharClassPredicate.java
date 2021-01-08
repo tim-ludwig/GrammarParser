@@ -14,6 +14,7 @@ import java.lang.Character.UnicodeBlock;
 import java.util.Arrays;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import me.tludwig.parsing.UnicodeGeneralCategory;
 import me.tludwig.parsing.peg.expressions.primaries.LiteralCharClass;
@@ -227,15 +228,28 @@ public abstract class CharClassPredicate implements IntPredicate {
 			case BLOCK:
 				return block(UnicodeBlock.forName(new String(realData, 0, realData.length)));
 			case UNION:
-				// TODO
-				return union();
+				return union(multipleFromData(realData));
 			case INTERSECTION:
-				// TODO
-				return intersection();
+				return intersection(multipleFromData(realData));
 			case NEGATION:
 				return negation(fromData(realData));
 		}
 		
 		return null;
+	}
+	
+	private static CharClassPredicate[] multipleFromData(final int[] data) {
+		final Stream.Builder<CharClassPredicate> builder = Stream.builder();
+		
+		int[] d;
+		for(int i = 0; i < data.length; i += d.length) {
+			d = new int[data[i + 1] + 2];
+			
+			System.arraycopy(data, i, d, 0, d.length);
+			
+			builder.add(fromData(d));
+		}
+		
+		return builder.build().toArray(CharClassPredicate[]::new);
 	}
 }
