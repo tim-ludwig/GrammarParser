@@ -35,33 +35,31 @@ public class ParserGenerator {
 			final AbstractSyntaxTree grammarAST = parser.abstractSyntaxTree(text);
 			
 			grammar = new PEGrammar(grammarAST.getChildren(0).getChildren(0).getText()) {
+				
 				@Override
 				protected void init() {
-					for(final AbstractSyntaxTree ast : grammarAST.getChildren()) {
+					for(final AbstractSyntaxTree ast : grammarAST.getChildren())
 						def(ast.getChildren(0).getText(), expression(ast.getChildren(1)));
-					}
 				}
 				
 				private Expression expression(final AbstractSyntaxTree exp) {
-					if(exp.getChildrenCount() > 1)
-						return choice(exp.getChildren().stream().map(this::sequence).toArray(Expression[]::new));
+					if(exp.getChildrenCount() > 1) return choice(exp.getChildren().stream().map(this::sequence).toArray(Expression[]::new));
 					
 					return sequence(exp.getChildren(0));
 				}
 				
 				private Expression sequence(final AbstractSyntaxTree seq) {
-					if(seq.getChildrenCount() > 1)
-						return seq(seq.getChildren().stream().map(this::sequenceElement).toArray(Expression[]::new));
+					if(seq.getChildrenCount() > 1) return seq(seq.getChildren().stream().map(this::sequenceElement).toArray(Expression[]::new));
 					
 					return sequenceElement(seq.getChildren(0));
 				}
 				
 				private Expression sequenceElement(final AbstractSyntaxTree elem) {
 					if(elem.getChildrenCount() == 3) {
-						System.out.println(elem.getChildren(2));
+						System.err.println(elem.getChildren(2)); // XXX
 						
 						return null;
-					} else if(elem.getChildrenCount() == 2) {
+					}else if(elem.getChildrenCount() == 2) {
 						final AbstractSyntaxTree child0 = elem.getChildren(0), child1 = elem.getChildren(1);
 						
 						if(child0.getName().equals("Prefix")) {
@@ -101,8 +99,7 @@ public class ParserGenerator {
 							return prim.getChildren().stream().map(ast -> {
 								if(ast.getChildrenCount() == 0) return list(ast.getText().charAt(0));
 								
-								return range(ast.getChildren(0).getText().charAt(0),
-										ast.getChildren(1).getText().charAt(0));
+								return range(ast.getChildren(0).getText().charAt(0), ast.getChildren(1).getText().charAt(0));
 							}).reduce(LiteralCharClass::union).get();
 						case "DOT":
 							return new LiteralAnyChar();
@@ -112,7 +109,7 @@ public class ParserGenerator {
 				}
 				
 			};
-		} catch(final Exception e) {
+		}catch(final Exception e) {
 			grammar = null;
 		}
 		
@@ -120,9 +117,7 @@ public class ParserGenerator {
 	}
 	
 	public PEGrammar getGrammar() {
-		if(grammar == null) {
-			generate();
-		}
+		if(grammar == null) generate();
 		
 		return grammar;
 	}

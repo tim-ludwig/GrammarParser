@@ -21,7 +21,7 @@ import me.tludwig.parsing.peg.expressions.primaries.LiteralCharClass;
 public abstract class CharClassPredicate implements IntPredicate {
 	private final CharClassPredicateType type;
 	
-	public CharClassPredicate(final CharClassPredicateType type) {
+	private CharClassPredicate(final CharClassPredicateType type) {
 		this.type = type;
 	}
 	
@@ -199,9 +199,10 @@ public abstract class CharClassPredicate implements IntPredicate {
 	}
 	
 	public static int[] getData(final CharClassPredicate predicate) {
-		final int[] array = new int[predicate.data().length + 2];
+		final int dataLength = predicate.data().length;
+		final int[] array = new int[dataLength + 2];
 		
-		System.arraycopy(predicate.data(), 0, array, 2, array.length);
+		System.arraycopy(predicate.data(), 0, array, 2, dataLength);
 		
 		array[0] = predicate.id();
 		array[1] = predicate.data().length;

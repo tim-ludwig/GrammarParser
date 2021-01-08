@@ -29,6 +29,10 @@ public final class LiteralCharClass extends Primary {
 		return new LiteralCharClass(CharClassPredicate.intersection(CharClassPredicate.convert(this, classes)));
 	}
 	
+	public static LiteralCharClass of(final CharClassPredicate predicate) {
+		return new LiteralCharClass(predicate);
+	}
+	
 	public static LiteralCharClass of(final char... chars) {
 		return new LiteralCharClass(CharClassPredicate.list(chars));
 	}

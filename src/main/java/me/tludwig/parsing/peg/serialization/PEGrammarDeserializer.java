@@ -15,6 +15,7 @@ import me.tludwig.parsing.peg.expressions.Expression;
 import me.tludwig.parsing.peg.expressions.Predicate;
 import me.tludwig.parsing.peg.expressions.Predicate.PredicateType;
 import me.tludwig.parsing.peg.expressions.primaries.EndOfFile;
+import me.tludwig.parsing.peg.expressions.primaries.LiteralCharClass;
 
 public class PEGrammarDeserializer {
 	public static final byte[] MAGIC_BYTES = PEGrammarSerializer.MAGIC_BYTES;
@@ -62,13 +63,12 @@ public class PEGrammarDeserializer {
 						case CHAR:
 							return character(readInt());
 						case CHAR_CLASS:
-							// FIXME
 							final int[] data = new int[readInt()];
 							
 							for(int i = 0; i < data.length; i++)
 								data[i] = readInt();
 							
-							return CharClassPredicate.fromData(data);
+							return LiteralCharClass.of(CharClassPredicate.fromData(data));
 						case CHOICE:
 							final Expression[] sub = new Expression[readInt()];
 							

@@ -58,6 +58,6 @@ public class LiteralChar extends Primary {
 			default:
 		}
 		
-		return "" + c;
+		return String.valueOf(Character.toChars(c));
 	}
 }

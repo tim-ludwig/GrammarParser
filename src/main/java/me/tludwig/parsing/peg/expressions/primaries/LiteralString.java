@@ -36,7 +36,6 @@ public class LiteralString extends Primary {
 	}
 	
 	private String escape() {
-		return s.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\r", "\\r")
-				.replace("\f", "\\f").replace("\"", "\\\"");
+		return s.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n").replace("\r", "\\r").replace("\f", "\\f").replace("\"", "\\\"");
 	}
 }

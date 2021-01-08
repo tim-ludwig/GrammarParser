@@ -9,7 +9,7 @@ public class LiteralAnyChar extends Primary {
 	public ParseTree parseTree(final String input, final int position) {
 		if(position >= input.length()) return null;
 		
-		return new ParseTree(this, position, input.charAt(position) + "");
+		return new ParseTree(this, position, String.valueOf(Character.toChars(input.codePointAt(position))));
 	}
 	
 	@Override
